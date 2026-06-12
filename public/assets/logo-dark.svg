@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 32" fill="none">
+  <g stroke="#E5E8EE" stroke-width="2" stroke-linecap="square" fill="none">
+    <path d="M5 8 L5 26 L10 26"></path>
+    <path d="M27 8 L27 26 L22 26"></path>
+    <path d="M10 22 L22 22"></path>
+    <path d="M16 22 L16 10">></path>
+  </g>
+  <text x="38" y="22" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="20" font-weight="500" fill="#E5E8EE" letter-spacing="-0.4">vinyos</text>
+</svg>
