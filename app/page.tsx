@@ -1018,68 +1018,71 @@ export default function LandingPage() {
               <div className="lnd-label">Preise</div>
               <h2 className="lnd-section-h2">Transparent. Ohne Überraschungen.</h2>
               <p className="lnd-section-lead">
-                Kostenlos testen, dann nutzungsbasiert abrechnen. Eine manuelle Kalkulation
-                kostet Sie ein Vielfaches an Arbeitszeit.
+                Erster Monat gratis, danach ein fester Monatstarif mit inklusivem
+                Anfrage-Kontingent. Eine manuelle Kalkulation kostet Sie ein Vielfaches an Arbeitszeit.
               </p>
               <p className="lnd-pricing-note">Eine <strong>Anfrage</strong> = ein Teil (ein PDF + STEP-Paar). Staffelkalkulationen für mehrere Stückzahlen zählen als eine Anfrage.</p>
             </Reveal>
             <div className="lnd-pricing">
               <Reveal className="lnd-plan">
-                <div className="lnd-plan-head">
-                  <div className="lnd-plan-name">Free</div>
-                  <div className="lnd-plan-price"><span className="lnd-plan-amount">0 €</span><span className="lnd-plan-period">einmalig</span></div>
-                  <p className="lnd-plan-sub">Zum Testen der Präzision. Keine Kreditkarte erforderlich.</p>
-                </div>
-                <button className="lnd-plan-btn" onClick={go}>Kostenlos testen</button>
-                <ul className="lnd-plan-items">
-                  <PlanItem on>10 Anfragen einmalig gratis</PlanItem>
-                  <PlanItem on>Vollständige KI-Analyse</PlanItem>
-                  <PlanItem on>3D-Viewer &amp; PDF-Export</PlanItem>
-                  <PlanItem on>1 Maschine</PlanItem>
-                  <PlanItem>Team-Mitglieder</PlanItem>
-                  <PlanItem>Kundennormen</PlanItem>
-                  <PlanItem>Prioritäts-Support</PlanItem>
-                </ul>
-              </Reveal>
-
-              <Reveal delay={90} className="lnd-plan">
                 <div className="lnd-plan-badge lnd-plan-badge--free">1. Monat gratis</div>
                 <div className="lnd-plan-head">
-                  <div className="lnd-plan-name">Pro <span className="lnd-plan-billing">Monatlich</span></div>
-                  <div className="lnd-plan-price"><span className="lnd-plan-amount">97 €</span><span className="lnd-plan-period">/ Monat</span></div>
-                  <p className="lnd-plan-sub">Erster Monat gratis · 0,85 € pro Anfrage · monatlich kündbar.</p>
+                  <div className="lnd-plan-name">Starter</div>
+                  <div className="lnd-plan-price"><span className="lnd-plan-amount">189 €</span><span className="lnd-plan-period">/ Monat</span></div>
+                  <p className="lnd-plan-sub">150 Anfragen/Monat · 1. Monat kostenfrei · monatlich kündbar.</p>
                 </div>
-                <button className="lnd-plan-btn" onClick={go}>Jetzt starten</button>
+                <button className="lnd-plan-btn" onClick={go}>1. Monat gratis starten</button>
                 <ul className="lnd-plan-items">
-                  <PlanItem on>Erster Monat kostenfrei</PlanItem>
-                  <PlanItem on>0,85 € pro Anfrage</PlanItem>
+                  <PlanItem on>1. Monat kostenfrei</PlanItem>
+                  <PlanItem on>150 Anfragen / Monat inklusive</PlanItem>
+                  <PlanItem on>Weitere Anfragen: 1,00 €</PlanItem>
                   <PlanItem on>Vollständige KI-Analyse</PlanItem>
                   <PlanItem on>3D-Viewer &amp; PDF-Export</PlanItem>
                   <PlanItem on>Unbegrenzte Maschinen</PlanItem>
-                  <PlanItem on>Bis zu 5 Team-Mitglieder</PlanItem>
-                  <PlanItem on>Kundennormen</PlanItem>
+                  <PlanItem on>Team-Mitglieder</PlanItem>
                 </ul>
               </Reveal>
 
-              <Reveal delay={180} className="lnd-plan lnd-plan--featured">
+              <Reveal delay={90} className="lnd-plan lnd-plan--featured">
                 <div className="lnd-plan-badge">Empfohlen</div>
                 <div className="lnd-plan-head">
-                  <div className="lnd-plan-name">Pro <span className="lnd-plan-billing">Jährlich</span></div>
-                  <div className="lnd-plan-price"><span className="lnd-plan-amount">949 €</span><span className="lnd-plan-period">/ Jahr</span></div>
-                  <p className="lnd-plan-sub">Über 2 Monate gratis ggü. monatlich · 0,85 € pro Anfrage.</p>
+                  <div className="lnd-plan-name">Pro</div>
+                  <div className="lnd-plan-price"><span className="lnd-plan-amount">349 €</span><span className="lnd-plan-period">/ Monat</span></div>
+                  <p className="lnd-plan-sub">350 Anfragen/Monat · effektiv 1,00 € pro Anfrage · 1. Monat gratis.</p>
                 </div>
-                <button className="lnd-plan-btn lnd-plan-btn--featured" onClick={go}>Jetzt starten</button>
+                <button className="lnd-plan-btn lnd-plan-btn--featured" onClick={go}>1. Monat gratis starten</button>
                 <ul className="lnd-plan-items">
-                  <PlanItem on>2 Monate gratis ggü. monatlich</PlanItem>
-                  <PlanItem on>0,85 € pro Anfrage</PlanItem>
+                  <PlanItem on>1. Monat kostenfrei</PlanItem>
+                  <PlanItem on>350 Anfragen / Monat inklusive</PlanItem>
+                  <PlanItem on>Weitere Anfragen: 1,00 €</PlanItem>
                   <PlanItem on>Vollständige KI-Analyse</PlanItem>
                   <PlanItem on>3D-Viewer &amp; PDF-Export</PlanItem>
                   <PlanItem on>Unbegrenzte Maschinen</PlanItem>
-                  <PlanItem on>Unbegrenzte Team-Mitglieder</PlanItem>
+                  <PlanItem on>Team-Mitglieder</PlanItem>
+                </ul>
+              </Reveal>
+
+              <Reveal delay={180} className="lnd-plan">
+                <div className="lnd-plan-head">
+                  <div className="lnd-plan-name">Enterprise</div>
+                  <div className="lnd-plan-price"><span className="lnd-plan-amount">579 €</span><span className="lnd-plan-period">/ Monat</span></div>
+                  <p className="lnd-plan-sub">700 Anfragen/Monat · effektiv 0,83 € pro Anfrage · 1. Monat gratis.</p>
+                </div>
+                <button className="lnd-plan-btn" onClick={go}>1. Monat gratis starten</button>
+                <ul className="lnd-plan-items">
+                  <PlanItem on>1. Monat kostenfrei</PlanItem>
+                  <PlanItem on>700 Anfragen / Monat inklusive</PlanItem>
+                  <PlanItem on>Weitere Anfragen: 1,00 €</PlanItem>
+                  <PlanItem on>Vollständige KI-Analyse</PlanItem>
+                  <PlanItem on>3D-Viewer &amp; PDF-Export</PlanItem>
+                  <PlanItem on>Unbegrenzte Maschinen</PlanItem>
                   <PlanItem on>Prioritäts-Support</PlanItem>
                 </ul>
               </Reveal>
             </div>
+            <Reveal>
+              <p className="lnd-pricing-note" style={{ marginTop: "28px" }}>Mehr als 700 Anfragen/Monat oder individuelle Anforderungen? <strong>Custom-Tarife auf Anfrage.</strong></p>
+            </Reveal>
           </div>
         </section>
 
@@ -1110,7 +1113,7 @@ export default function LandingPage() {
                 },
                 {
                   q: "Kann ich Vinyos mit meinem Team nutzen?",
-                  a: "Ja, ab dem Pro-Plan. Teammitglieder teilen sich Anfragen, Angebote, Maschinen und Einstellungen — mit rollenbasiertem Zugriff (Admin, Kalkulator). Der monatliche Plan unterstützt bis zu 5 Mitglieder, der Jahresplan ist unbegrenzt.",
+                  a: "Ja. Teammitglieder teilen sich Anfragen, Angebote, Maschinen und Einstellungen — mit rollenbasiertem Zugriff (Admin, Kalkulator). Verfügbar in allen Tarifen (Starter, Pro, Enterprise).",
                 },
               ].map(({ q, a }, i) => (
                 <details key={i} className="lnd-faq-item">
@@ -1131,7 +1134,7 @@ export default function LandingPage() {
             <div className="lnd-cta-grid" />
             <div className="lnd-cta-content">
               <h2 className="lnd-cta-h2">In Sekunden zum ersten<br />kalkulierten Teil.</h2>
-              <p className="lnd-cta-sub">10 Anfragen kostenlos — keine Kreditkarte, keine Einrichtung.</p>
+              <p className="lnd-cta-sub">1. Monat gratis — keine Kreditkarte, keine Einrichtung.</p>
               <div className="lnd-cta-actions">
                 <button className="lnd-btn-primary" onClick={go}>
                   Kostenlos testen
@@ -1216,7 +1219,7 @@ export default function LandingPage() {
         {/* ───────── STICKY CTA (mobil) ───────── */}
         <div className="lnd-sticky-cta" data-show={heroPassed && !navOpen}>
           <div className="lnd-sticky-cta-inner">
-            <span className="lnd-sticky-cta-txt">10 Anfragen gratis testen</span>
+            <span className="lnd-sticky-cta-txt">1. Monat gratis testen</span>
             <button className="lnd-btn-primary" onClick={go}>
               Starten
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
