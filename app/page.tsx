@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 /* ────────────────────────────────────────────────
    Scroll-Reveal
@@ -128,13 +129,17 @@ function DrawingScan({ reduced }: { reduced: boolean }) {
           <line x1="225" y1="57" x2="225" y2="133" strokeWidth="1" />
         </g>
 
-        {/* Maß ⌀40 h7 (links, vertikal) */}
+        {/* Maß ⌀40 h7 (links, vertikal) + Datum A auf Maßlinie (= Achse) */}
         <g className="lnd-de lnd-de-2" strokeWidth="1">
           <line x1="36" y1="70" x2="36" y2="120" />
           <path d="M36 70 l-2.5 6 h5 z M36 120 l-2.5 -6 h5 z" className="lnd-de-fill" />
           <line x1="36" y1="70" x2="48" y2="70" strokeWidth="0.7" />
           <line x1="36" y1="120" x2="48" y2="120" strokeWidth="0.7" />
           <text x="30" y="98" textAnchor="end" className="lnd-draw-txt">⌀40 h7</text>
+          {/* Datum A — Bezugsdreieck auf Maßlinie (ISO 1101: Achse als Datum) */}
+          <line x1="36" y1="120" x2="36" y2="132" strokeWidth="0.7" />
+          <rect x="29" y="132" width="14" height="14" fill="none" />
+          <text x="36" y="143" textAnchor="middle" className="lnd-draw-txt">A</text>
         </g>
 
         {/* Maß 80 (unten, horizontal) */}
@@ -163,22 +168,15 @@ function DrawingScan({ reduced }: { reduced: boolean }) {
         {/* Rz 6,3 Oberflächenzeichen */}
         <g className="lnd-de lnd-de-5" strokeWidth="1">
           <path d="M86 48 l5 9 l9 -16" fill="none" />
-          <text x="104" y="46" className="lnd-draw-txt">Rz 6,3</text>
+          <text x="104" y="46" className="lnd-draw-txt">Ra 0,8</text>
           <line x1="91" y1="57" x2="91" y2="68" strokeWidth="0.7" />
         </g>
 
-        {/* Datum A */}
-        <g className="lnd-de lnd-de-6" strokeWidth="1">
-          <rect x="305" y="88" width="15" height="15" fill="none" />
-          <text x="312.5" y="99.5" textAnchor="middle" className="lnd-draw-txt">A</text>
-          <line x1="290" y1="95" x2="305" y2="95" strokeWidth="0.7" />
-          <path d="M290 95 l6 -2.5 v5 z" className="lnd-de-fill" />
-        </g>
       </svg>
 
       {/* Extrahierte Chips */}
       <div className="lnd-draw-chips">
-        {["⌀40 h7", "IT7", "⊥ 0,02 A", "Rz 6,3", "C45"].map((c, i) => (
+        {["⌀40 h7", "IT7", "⊥ 0,02 A", "Ra 0,8", "C45"].map((c, i) => (
           <span key={c} className="lnd-draw-chip" style={{ animationDelay: `${1.0 + i * 0.45}s` }}>
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M1.5 5l2.5 2.5L8.5 2.5" /></svg>
             {c}
@@ -573,8 +571,8 @@ function PartViewer() {
 }
 
 export default function LandingPage() {
-  const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.vinyos.de";
-  const go = () => { window.location.href = `${APP_URL}/login`; };
+  const router = useRouter();
+  const go = () => router.push("/login");
 
   const heroRef = useRef<HTMLElement>(null);
   const [heroIn, setHeroIn] = useState(false);
@@ -582,19 +580,37 @@ export default function LandingPage() {
   const [reduced, setReduced] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [heroPassed, setHeroPassed] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const [contactName, setContactName] = useState("");
+  const [contactCompany, setContactCompany] = useState("");
   const [contactEmail, setContactEmail] = useState("");
-  const [contactSubject, setContactSubject] = useState("Demo anfragen");
   const [contactMsg, setContactMsg] = useState("");
   const [contactState, setContactState] = useState<"idle" | "sending" | "done" | "error">("idle");
 
+  // ── ROI / Ersparnis-Rechner ──
+  const [roiAnfragen, setRoiAnfragen] = useState(200); // Anfragen / Monat
+  const [roiMinuten, setRoiMinuten] = useState(20);    // Min pro manueller Kalkulation
+  const [roiSatz, setRoiSatz] = useState(45);          // €/h Kalkulator
+  const anfragenJahr = roiAnfragen * 12;
+  const stundenManuell = (anfragenJahr * roiMinuten) / 60;
+  const stundenVinyos = (anfragenJahr * 1) / 60; // ~1 Min Bearbeitung pro Teil mit Vinyos
+  const stundenGespartBrutto = Math.max(0, stundenManuell - stundenVinyos);
+  const stundenGespart = stundenGespartBrutto * 0.8; // 80% Effizienz-Ansatz
+  const kostenGespart = stundenGespart * roiSatz;
+  const aboJahr = 949; // Vinyos Pro Yearly (vgl. PREISE)
+  const nettoErsparnis = Math.max(0, kostenGespart - aboJahr);
+  const fmtEur = (n: number) => n.toLocaleString("de-DE", { maximumFractionDigits: 0 });
+  const fmtH = (n: number) => n.toLocaleString("de-DE", { maximumFractionDigits: 0 });
+
+  const openContact = (e: React.MouseEvent) => { e.preventDefault(); setContactOpen(true); };
+  const closeContact = () => { setContactOpen(false); setContactState("idle"); };
   const sendContact = async (e: React.FormEvent) => {
     e.preventDefault();
     setContactState("sending");
     const res = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: contactName, email: contactEmail, subject: contactSubject, message: contactMsg }),
+      body: JSON.stringify({ name: contactName, company: contactCompany, email: contactEmail, message: contactMsg }),
     });
     setContactState(res.ok ? "done" : "error");
   };
@@ -615,11 +631,11 @@ export default function LandingPage() {
     return () => clearInterval(id);
   }, [reduced, heroIn]);
 
-  // Body-Scroll-Lock, solange das Mobile-Menü offen ist
+  // Body-Scroll-Lock, solange das Mobile-Menü oder Kontakt-Modal offen ist
   useEffect(() => {
-    document.body.style.overflow = navOpen ? "hidden" : "";
+    document.body.style.overflow = (navOpen || contactOpen) ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [navOpen]);
+  }, [navOpen, contactOpen]);
 
   // Sticky-CTA (mobil) einblenden, sobald der Hero aus dem Blick gescrollt ist
   useEffect(() => {
@@ -649,10 +665,10 @@ export default function LandingPage() {
             <div className="lnd-nav-links">
               <a href="#funktionen" className="lnd-nav-link">Funktionen</a>
               <a href="#praezision" className="lnd-nav-link">Präzision</a>
-              <a href="#ansicht" className="lnd-nav-link">3D-Ansicht</a>
               <a href="#kalkulation" className="lnd-nav-link">Kalkulation</a>
+              <a href="#ersparnis" className="lnd-nav-link">Ersparnis</a>
               <a href="#preise" className="lnd-nav-link">Preise</a>
-              <a href="#kontakt" className="lnd-nav-link">Kontakt</a>
+              <a href="#kontakt" className="lnd-nav-link" onClick={openContact}>Kontakt</a>
             </div>
             <button className="lnd-btn-nav" onClick={go}>Kostenlos testen</button>
             <button
@@ -671,10 +687,10 @@ export default function LandingPage() {
           <div className="lnd-nav-drawer" data-open={navOpen}>
             <a href="#funktionen" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Funktionen</a>
             <a href="#praezision" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Präzision</a>
-            <a href="#ansicht" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>3D-Ansicht</a>
             <a href="#kalkulation" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Kalkulation</a>
+            <a href="#ersparnis" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Ersparnis</a>
             <a href="#preise" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Preise</a>
-            <a href="#kontakt" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Kontakt</a>
+            <a href="#kontakt" className="lnd-nav-drawer-link" onClick={(e) => { setNavOpen(false); openContact(e); }}>Kontakt</a>
             <button className="lnd-btn-primary lnd-nav-drawer-cta" onClick={() => { setNavOpen(false); go(); }}>Kostenlos testen</button>
           </div>
         </nav>
@@ -944,8 +960,8 @@ export default function LandingPage() {
                     <span className="lnd-calc-meta-lab">Drehzahl je Schnitt</span>
                   </div>
                   <div className="lnd-calc-meta-item">
-                    <span className="lnd-calc-meta-val">√(Stückzahl)</span>
-                    <span className="lnd-calc-meta-lab">QS-Stichprobenlogik</span>
+                    <span className="lnd-calc-meta-val">HK = (t<sub>R</sub>/n + t<sub>c</sub>)·h</span>
+                    <span className="lnd-calc-meta-lab">Stückkosten-Formel</span>
                   </div>
                 </div>
               </Reveal>
@@ -1011,120 +1027,152 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ───────── ERSPARNIS / ROI ───────── */}
+        <section className="lnd-section" id="ersparnis">
+          <div className="lnd-section-inner">
+            <Reveal className="lnd-section-head">
+              <div className="lnd-label">Ersparnis</div>
+              <h2 className="lnd-section-h2">Was Vinyos Ihnen im Jahr spart</h2>
+              <p className="lnd-section-lead">
+                Tragen Sie Ihre Zahlen ein — die Ersparnis pro Jahr berechnet sich live.
+              </p>
+            </Reveal>
+
+            <Reveal className="lnd-roi-grid">
+              <div className="lnd-roi-inputs">
+                <div className="lnd-roi-field">
+                  <label htmlFor="roi-anfragen">Anfragen pro Monat</label>
+                  <input
+                    id="roi-anfragen"
+                    type="number"
+                    min={0}
+                    value={roiAnfragen}
+                    onChange={(e) => setRoiAnfragen(Math.max(0, Number(e.target.value) || 0))}
+                  />
+                </div>
+                <div className="lnd-roi-field">
+                  <label htmlFor="roi-minuten">Minuten je manueller Kalkulation</label>
+                  <input
+                    id="roi-minuten"
+                    type="number"
+                    min={0}
+                    value={roiMinuten}
+                    onChange={(e) => setRoiMinuten(Math.max(0, Number(e.target.value) || 0))}
+                  />
+                </div>
+                <div className="lnd-roi-field">
+                  <label htmlFor="roi-satz">Stundensatz Kalkulator (€/h)</label>
+                  <input
+                    id="roi-satz"
+                    type="number"
+                    min={0}
+                    value={roiSatz}
+                    onChange={(e) => setRoiSatz(Math.max(0, Number(e.target.value) || 0))}
+                  />
+                </div>
+                <p className="lnd-roi-note">
+                  Beispielrechnung. Annahme: ~1 Min Bearbeitung pro Teil mit Vinyos, Vinyos Pro 949 €/Jahr.
+                </p>
+              </div>
+
+              <div className="lnd-roi-result">
+                <div className="lnd-roi-result-lab">Ihre Netto-Ersparnis pro Jahr</div>
+                <div className="lnd-roi-big">{fmtEur(nettoErsparnis)} €</div>
+                <div className="lnd-roi-rows">
+                  <div className="lnd-roi-row">
+                    <span>Zeitersparnis <span className="lnd-roi-note-inline">(80 % eff.)</span></span>
+                    <span className="lnd-roi-val">{fmtH(stundenGespart)} h / Jahr</span>
+                  </div>
+                  <div className="lnd-roi-row">
+                    <span>Arbeitskosten gespart</span>
+                    <span className="lnd-roi-val">{fmtEur(kostenGespart)} €</span>
+                  </div>
+                  <div className="lnd-roi-row lnd-roi-row--sub">
+                    <span>abzgl. Vinyos Pro</span>
+                    <span className="lnd-roi-val">− {fmtEur(aboJahr)} €</span>
+                  </div>
+                </div>
+                <button className="lnd-btn-primary lnd-roi-cta" onClick={go}>
+                  Jetzt kostenlos testen
+                </button>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
         {/* ───────── PREISE ───────── */}
         <section className="lnd-section" id="preise">
           <div className="lnd-section-inner">
             <Reveal className="lnd-section-head">
               <div className="lnd-label">Preise</div>
               <h2 className="lnd-section-h2">Transparent. Ohne Überraschungen.</h2>
+              <div className="lnd-price-badge">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M7 1l1.5 3 3.5.5-2.5 2.5.5 3.5L7 9l-3 1.5.5-3.5L2 4.5 5.5 4z"/></svg>
+                Preisgünstigster Anbieter auf dem Markt
+              </div>
               <p className="lnd-section-lead">
-                Erster Monat gratis, danach ein fester Monatstarif mit inklusivem
-                Anfrage-Kontingent. Eine manuelle Kalkulation kostet Sie ein Vielfaches an Arbeitszeit.
+                Kostenlos testen, dann nutzungsbasiert abrechnen. Eine manuelle Kalkulation
+                kostet Sie ein Vielfaches an Arbeitszeit.
               </p>
-              <p className="lnd-pricing-note">Eine <strong>Anfrage</strong> = ein Teil (ein PDF + STEP-Paar). Staffelkalkulationen für mehrere Stückzahlen zählen als eine Anfrage.</p>
+              <p className="lnd-pricing-note">Eine <strong>Anfrage</strong> = ein Teil (PDF + STEP), danach beliebig oft kostenlos kalkulieren.</p>
             </Reveal>
             <div className="lnd-pricing">
               <Reveal className="lnd-plan">
+                <div className="lnd-plan-head">
+                  <div className="lnd-plan-name">Free</div>
+                  <div className="lnd-plan-price"><span className="lnd-plan-amount">0 €</span><span className="lnd-plan-period">einmalig</span></div>
+                  <p className="lnd-plan-sub">Zum Testen der Präzision. Keine Kreditkarte erforderlich.</p>
+                </div>
+                <button className="lnd-plan-btn" onClick={go}>Kostenlos testen</button>
+                <ul className="lnd-plan-items">
+                  <PlanItem on>10 Anfragen einmalig gratis</PlanItem>
+                  <PlanItem on>Vollständige KI-Analyse</PlanItem>
+                  <PlanItem on>3D-Viewer &amp; PDF-Export</PlanItem>
+                  <PlanItem on>1 Maschine</PlanItem>
+                  <PlanItem>Team-Mitglieder</PlanItem>
+                  <PlanItem>Kundennormen</PlanItem>
+                  <PlanItem>Prioritäts-Support</PlanItem>
+                </ul>
+              </Reveal>
+
+              <Reveal delay={90} className="lnd-plan">
                 <div className="lnd-plan-badge lnd-plan-badge--free">1. Monat gratis</div>
                 <div className="lnd-plan-head">
-                  <div className="lnd-plan-name">Starter</div>
-                  <div className="lnd-plan-price"><span className="lnd-plan-amount">189 €</span><span className="lnd-plan-period">/ Monat</span></div>
-                  <p className="lnd-plan-sub">150 Anfragen/Monat · 1. Monat kostenfrei · monatlich kündbar.</p>
+                  <div className="lnd-plan-name">Pro <span className="lnd-plan-billing">Monatlich</span></div>
+                  <div className="lnd-plan-price"><span className="lnd-plan-amount">97 €</span><span className="lnd-plan-period">/ Monat</span></div>
+                  <p className="lnd-plan-sub">Erster Monat gratis · 0,85 € pro Anfrage · monatlich kündbar.</p>
                 </div>
-                <button className="lnd-plan-btn" onClick={go}>1. Monat gratis starten</button>
+                <button className="lnd-plan-btn" onClick={go}>Jetzt starten</button>
                 <ul className="lnd-plan-items">
-                  <PlanItem on>1. Monat kostenfrei</PlanItem>
-                  <PlanItem on>150 Anfragen / Monat inklusive</PlanItem>
-                  <PlanItem on>Weitere Anfragen: 1,00 €</PlanItem>
+                  <PlanItem on>Erster Monat kostenfrei</PlanItem>
+                  <PlanItem on>0,85 € pro Anfrage</PlanItem>
                   <PlanItem on>Vollständige KI-Analyse</PlanItem>
                   <PlanItem on>3D-Viewer &amp; PDF-Export</PlanItem>
                   <PlanItem on>Unbegrenzte Maschinen</PlanItem>
-                  <PlanItem on>Team-Mitglieder</PlanItem>
+                  <PlanItem on>Bis zu 5 Team-Mitglieder</PlanItem>
+                  <PlanItem on>Kundennormen</PlanItem>
                 </ul>
               </Reveal>
 
-              <Reveal delay={90} className="lnd-plan lnd-plan--featured">
+              <Reveal delay={180} className="lnd-plan lnd-plan--featured">
                 <div className="lnd-plan-badge">Empfohlen</div>
                 <div className="lnd-plan-head">
-                  <div className="lnd-plan-name">Pro</div>
-                  <div className="lnd-plan-price"><span className="lnd-plan-amount">349 €</span><span className="lnd-plan-period">/ Monat</span></div>
-                  <p className="lnd-plan-sub">350 Anfragen/Monat · effektiv 1,00 € pro Anfrage · 1. Monat gratis.</p>
+                  <div className="lnd-plan-name">Pro <span className="lnd-plan-billing">Jährlich</span></div>
+                  <div className="lnd-plan-price"><span className="lnd-plan-amount">949 €</span><span className="lnd-plan-period">/ Jahr</span></div>
+                  <p className="lnd-plan-sub">Über 2 Monate gratis ggü. monatlich · 0,85 € pro Anfrage.</p>
                 </div>
-                <button className="lnd-plan-btn lnd-plan-btn--featured" onClick={go}>1. Monat gratis starten</button>
+                <button className="lnd-plan-btn lnd-plan-btn--featured" onClick={go}>Jetzt starten</button>
                 <ul className="lnd-plan-items">
-                  <PlanItem on>1. Monat kostenfrei</PlanItem>
-                  <PlanItem on>350 Anfragen / Monat inklusive</PlanItem>
-                  <PlanItem on>Weitere Anfragen: 1,00 €</PlanItem>
+                  <PlanItem on>2 Monate gratis ggü. monatlich</PlanItem>
+                  <PlanItem on>0,85 € pro Anfrage</PlanItem>
                   <PlanItem on>Vollständige KI-Analyse</PlanItem>
                   <PlanItem on>3D-Viewer &amp; PDF-Export</PlanItem>
                   <PlanItem on>Unbegrenzte Maschinen</PlanItem>
-                  <PlanItem on>Team-Mitglieder</PlanItem>
-                </ul>
-              </Reveal>
-
-              <Reveal delay={180} className="lnd-plan">
-                <div className="lnd-plan-head">
-                  <div className="lnd-plan-name">Enterprise</div>
-                  <div className="lnd-plan-price"><span className="lnd-plan-amount">579 €</span><span className="lnd-plan-period">/ Monat</span></div>
-                  <p className="lnd-plan-sub">700 Anfragen/Monat · effektiv 0,83 € pro Anfrage · 1. Monat gratis.</p>
-                </div>
-                <button className="lnd-plan-btn" onClick={go}>1. Monat gratis starten</button>
-                <ul className="lnd-plan-items">
-                  <PlanItem on>1. Monat kostenfrei</PlanItem>
-                  <PlanItem on>700 Anfragen / Monat inklusive</PlanItem>
-                  <PlanItem on>Weitere Anfragen: 1,00 €</PlanItem>
-                  <PlanItem on>Vollständige KI-Analyse</PlanItem>
-                  <PlanItem on>3D-Viewer &amp; PDF-Export</PlanItem>
-                  <PlanItem on>Unbegrenzte Maschinen</PlanItem>
+                  <PlanItem on>Unbegrenzte Team-Mitglieder</PlanItem>
                   <PlanItem on>Prioritäts-Support</PlanItem>
                 </ul>
               </Reveal>
             </div>
-            <Reveal>
-              <p className="lnd-pricing-note" style={{ marginTop: "28px" }}>Mehr als 700 Anfragen/Monat oder individuelle Anforderungen? <strong>Custom-Tarife auf Anfrage.</strong></p>
-            </Reveal>
-          </div>
-        </section>
-
-        {/* ───────── FAQ ───────── */}
-        <section className="lnd-section" id="faq">
-          <div className="lnd-section-inner">
-            <Reveal className="lnd-section-head">
-              <div className="lnd-label">FAQ</div>
-              <h2 className="lnd-section-h2">Häufige Fragen.</h2>
-            </Reveal>
-            <Reveal className="lnd-faq">
-              {[
-                {
-                  q: "Welche Dateiformate werden unterstützt?",
-                  a: "Vinyos verarbeitet technische Zeichnungen als PDF und 3D-Modelle im STEP-Format (.stp / .step). PDF + STEP werden automatisch als Paar erkannt, wenn der Dateiname übereinstimmt.",
-                },
-                {
-                  q: "Wie genau ist die Kalkulation?",
-                  a: "Die Engine berechnet Schnittzeiten, Rüstkosten und Material physikalisch — keine KI-Schätzwerte. Sie hinterlegen Ihre eigenen Stundensätze, Maschinensätze und Marge. Das Ergebnis ist ein Vorschlag, den Sie vor der Freigabe prüfen und anpassen können.",
-                },
-                {
-                  q: "Sind meine Zeichnungen und Daten sicher?",
-                  a: "Ja. Alle Daten werden ausschließlich in der EU (Frankfurt, AWS eu-central-1) gespeichert und verarbeitet. Ihre Zeichnungen werden nicht zum Training von KI-Modellen verwendet und nicht an Dritte weitergegeben. Der Dienst ist DSGVO-konform.",
-                },
-                {
-                  q: "Was ist eine Anfrage genau?",
-                  a: "Eine Anfrage entspricht einem Teil — also einem PDF + STEP-Paar. Wenn Sie für ein Teil mehrere Stückzahlen kalkulieren (z. B. 1, 10, 50 Stück), zählt das trotzdem als eine Anfrage.",
-                },
-                {
-                  q: "Kann ich Vinyos mit meinem Team nutzen?",
-                  a: "Ja. Teammitglieder teilen sich Anfragen, Angebote, Maschinen und Einstellungen — mit rollenbasiertem Zugriff (Admin, Kalkulator). Verfügbar in allen Tarifen (Starter, Pro, Enterprise).",
-                },
-              ].map(({ q, a }, i) => (
-                <details key={i} className="lnd-faq-item">
-                  <summary className="lnd-faq-q">
-                    {q}
-                    <svg className="lnd-faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M4 6l4 4 4-4" /></svg>
-                  </summary>
-                  <p className="lnd-faq-a">{a}</p>
-                </details>
-              ))}
-            </Reveal>
           </div>
         </section>
 
@@ -1134,7 +1182,7 @@ export default function LandingPage() {
             <div className="lnd-cta-grid" />
             <div className="lnd-cta-content">
               <h2 className="lnd-cta-h2">In Sekunden zum ersten<br />kalkulierten Teil.</h2>
-              <p className="lnd-cta-sub">1. Monat gratis — keine Kreditkarte, keine Einrichtung.</p>
+              <p className="lnd-cta-sub">10 Anfragen kostenlos — keine Kreditkarte, keine Einrichtung.</p>
               <div className="lnd-cta-actions">
                 <button className="lnd-btn-primary" onClick={go}>
                   Kostenlos testen
@@ -1144,57 +1192,11 @@ export default function LandingPage() {
               <div className="lnd-cta-contact">
                 Abrechnung einfach per hinterlegter Kreditkarte oder auf Rechnung.
               </div>
-            </div>
-          </Reveal>
-        </section>
-
-        {/* ───────── KONTAKT-SEKTION ───────── */}
-        <section id="kontakt" className="lnd-contact-wrap">
-          <Reveal className="lnd-contact-inner">
-            <p className="eyebrow" style={{textAlign:"center",marginBottom:"12px"}}>Kontakt</p>
-            <h2 className="lnd-contact-h2">Noch Fragen?</h2>
-            <p className="lnd-contact-sub">Wir antworten meist innerhalb eines Werktages.</p>
-            {contactState === "done" ? (
-              <div className="lnd-contact-success">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="20" cy="20" r="18" /><path d="M12 20l6 6 10-12" /></svg>
-                <h3>Nachricht gesendet!</h3>
-                <p>Wir melden uns so schnell wie möglich.</p>
-                <button className="lnd-btn-primary" onClick={() => setContactState("idle")}>Weitere Nachricht senden</button>
+              <div className="lnd-cta-contact">
+                Noch Fragen?{" "}
+                <a href="#kontakt" onClick={openContact}>Kontakt aufnehmen</a>
               </div>
-            ) : (
-              <form className="lnd-contact-form" onSubmit={sendContact}>
-                <div className="lnd-contact-row">
-                  <label>
-                    Name
-                    <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Max Mustermann" required disabled={contactState === "sending"} />
-                  </label>
-                  <label>
-                    E-Mail
-                    <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="name@firma.de" required disabled={contactState === "sending"} />
-                  </label>
-                </div>
-                <label>
-                  Betreff
-                  <select value={contactSubject} onChange={(e) => setContactSubject(e.target.value)} disabled={contactState === "sending"}>
-                    <option value="Demo anfragen">Demo anfragen</option>
-                    <option value="Frage zum Produkt">Frage zum Produkt</option>
-                    <option value="Preise & Pläne">Preise &amp; Pläne</option>
-                    <option value="Sonstiges">Sonstiges</option>
-                  </select>
-                </label>
-                <label>
-                  Nachricht
-                  <textarea value={contactMsg} onChange={(e) => setContactMsg(e.target.value)} placeholder="Ihre Frage oder Nachricht…" rows={4} required disabled={contactState === "sending"} />
-                </label>
-                {contactState === "error" && (
-                  <p className="lnd-contact-error">Fehler beim Senden. Bitte schreiben Sie direkt an <a href="mailto:kontakt@vinyos.de">kontakt@vinyos.de</a>.</p>
-                )}
-                <button className="lnd-btn-primary lnd-contact-submit" type="submit" disabled={contactState === "sending"}>
-                  {contactState === "sending" ? "Wird gesendet…" : "Nachricht senden"}
-                  {contactState !== "sending" && <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>}
-                </button>
-              </form>
-            )}
+            </div>
           </Reveal>
         </section>
 
@@ -1210,7 +1212,15 @@ export default function LandingPage() {
               <a href="/impressum">Impressum</a>
               <a href="/datenschutz">Datenschutz</a>
               <a href="/agb">AGB</a>
-              <a href="#kontakt">Kontakt</a>
+              <a href="#kontakt" onClick={openContact}>Kontakt</a>
+            </div>
+            <div className="lnd-footer-social">
+              <a href="#" aria-label="LinkedIn" className="lnd-footer-social-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              </a>
+              <a href="#" aria-label="Instagram" className="lnd-footer-social-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              </a>
             </div>
             <div className="lnd-footer-copy">© 2026 Vinyos AI UG</div>
           </div>
@@ -1219,7 +1229,7 @@ export default function LandingPage() {
         {/* ───────── STICKY CTA (mobil) ───────── */}
         <div className="lnd-sticky-cta" data-show={heroPassed && !navOpen}>
           <div className="lnd-sticky-cta-inner">
-            <span className="lnd-sticky-cta-txt">1. Monat gratis testen</span>
+            <span className="lnd-sticky-cta-txt">10 Anfragen gratis testen</span>
             <button className="lnd-btn-primary" onClick={go}>
               Starten
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
@@ -1228,6 +1238,53 @@ export default function LandingPage() {
         </div>
 
       </div>
+
+      {/* ───────── KONTAKT-MODAL ───────── */}
+      {contactOpen && (
+        <div className="lnd-modal-overlay" onClick={closeContact}>
+          <div className="lnd-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="lnd-modal-close" onClick={closeContact} aria-label="Schließen">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 3l10 10M13 3L3 13" /></svg>
+            </button>
+            {contactState === "done" ? (
+              <div className="lnd-modal-success">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="20" cy="20" r="18" /><path d="M12 20l6 6 10-12" /></svg>
+                <h3>Nachricht gesendet!</h3>
+                <p>Wir melden uns so schnell wie möglich bei Ihnen.</p>
+                <button className="lnd-btn-primary" onClick={closeContact}>Schließen</button>
+              </div>
+            ) : (
+              <form className="lnd-modal-form" onSubmit={sendContact}>
+                <h2>Kontakt aufnehmen</h2>
+                <p className="lnd-modal-sub">Wir antworten meist innerhalb eines Werktages.</p>
+                <label>
+                  Name
+                  <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Max Mustermann" required disabled={contactState === "sending"} />
+                </label>
+                <label>
+                  Firma <span style={{color:"#44495A",fontWeight:400}}>(optional)</span>
+                  <input type="text" value={contactCompany} onChange={(e) => setContactCompany(e.target.value)} placeholder="Mustermann GmbH" disabled={contactState === "sending"} />
+                </label>
+                <label>
+                  E-Mail
+                  <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="name@firma.de" required disabled={contactState === "sending"} />
+                </label>
+                <label>
+                  Nachricht
+                  <textarea value={contactMsg} onChange={(e) => setContactMsg(e.target.value)} placeholder="Ihre Frage oder Nachricht…" rows={5} required disabled={contactState === "sending"} />
+                </label>
+                {contactState === "error" && (
+                  <p className="lnd-modal-error">Fehler beim Senden. Bitte versuchen Sie es erneut oder schreiben Sie direkt an kontakt@vinyos.de.</p>
+                )}
+                <button className="lnd-btn-primary" type="submit" disabled={contactState === "sending"}>
+                  {contactState === "sending" ? "Wird gesendet…" : "Nachricht senden"}
+                  {contactState !== "sending" && <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -1762,6 +1819,23 @@ const CSS = `
   .lnd-calc-card { background: var(--lnd-surface); border: 1px solid var(--lnd-border); border-radius: 3px; padding: 26px 24px; }
   .lnd-calc-card-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 22px; font: 600 12px/1 var(--lnd-f-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--lnd-t2); }
   .lnd-calc-card-qty { font-size: 10px; color: var(--lnd-t3); letter-spacing: 0.04em; }
+  /* ── ROI / Ersparnis-Rechner ── */
+  .lnd-roi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 44px; align-items: start; }
+  .lnd-roi-inputs { display: flex; flex-direction: column; gap: 20px; }
+  .lnd-roi-field { display: flex; flex-direction: column; gap: 8px; }
+  .lnd-roi-field label { font: 500 13px/1.3 var(--lnd-f-ui); color: var(--lnd-t2); }
+  .lnd-roi-field input { width: 100%; height: 46px; padding: 0 14px; background: var(--lnd-surface); border: 1px solid var(--lnd-border); border-radius: 2px; color: var(--lnd-t1); font: 600 16px/1 var(--lnd-f-mono); transition: border-color 120ms; }
+  .lnd-roi-field input:focus { outline: none; border-color: var(--lnd-accent); }
+  .lnd-roi-note { font: 400 12px/1.6 var(--lnd-f-ui); color: var(--lnd-t3); margin: 4px 0 0; }
+  .lnd-roi-note-inline { font-size: 11px; color: var(--lnd-t3); }
+  .lnd-roi-result { background: var(--lnd-surface); border: 1px solid var(--lnd-border); border-radius: 3px; padding: 28px 26px; }
+  .lnd-roi-result-lab { font: 600 11px/1 var(--lnd-f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--lnd-t2); }
+  .lnd-roi-big { font: 700 46px/1.05 var(--lnd-f-mono); color: var(--lnd-success); letter-spacing: -0.02em; margin: 12px 0 22px; }
+  .lnd-roi-rows { display: flex; flex-direction: column; gap: 12px; padding-top: 18px; border-top: 1px solid var(--lnd-rule); }
+  .lnd-roi-row { display: flex; justify-content: space-between; align-items: baseline; font: 500 14px/1 var(--lnd-f-ui); color: var(--lnd-t1); }
+  .lnd-roi-row--sub { color: var(--lnd-t2); }
+  .lnd-roi-val { font: 600 14px/1 var(--lnd-f-mono); color: var(--lnd-t2); }
+  .lnd-roi-cta { width: 100%; margin-top: 24px; justify-content: center; }
   .lnd-calc-bars { display: flex; flex-direction: column; gap: 16px; }
   .lnd-calc-bar-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
   .lnd-calc-bar-lab { font: 500 13px/1 var(--lnd-f-ui); color: var(--lnd-t1); }
@@ -1820,7 +1894,7 @@ const CSS = `
   .lnd-plan-item--on svg { color: var(--lnd-success); flex-shrink: 0; }
   .lnd-plan-item--off { color: var(--lnd-t4); }
   .lnd-plan-item--off svg { color: var(--lnd-t4); flex-shrink: 0; }
-  .lnd-pricing-note { text-align: center; margin-top: 28px; font: 500 13px/1.5 var(--lnd-f-mono); color: var(--lnd-t3); }
+  .lnd-pricing-note { text-align: center; padding-top: 20px; border-top: 1px solid var(--lnd-rule); font: 400 13px/1.7 var(--lnd-f-ui); color: var(--lnd-t3); max-width: 620px; margin: 24px auto 0; }
   .lnd-pricing-note a { color: var(--lnd-accent); text-decoration: none; }
   .lnd-pricing-note a:hover { color: var(--lnd-accent-h); }
 
@@ -1861,10 +1935,15 @@ const CSS = `
   .lnd-footer-links a { padding: 4px 10px; font-size: 12px; color: var(--lnd-t3); text-decoration: none; transition: color 120ms; }
   .lnd-footer-links a:hover { color: var(--lnd-t1); }
   .lnd-footer-copy { font-size: 12px; color: var(--lnd-t3); }
+  .lnd-footer-social { display: flex; gap: 4px; align-items: center; }
+  .lnd-footer-social-link { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 2px; color: var(--lnd-t3); transition: color 120ms, background 120ms; }
+  .lnd-footer-social-link:hover { color: var(--lnd-t1); background: var(--lnd-elevated); }
+  .lnd-price-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: rgba(77,126,232,0.10); border: 1px solid rgba(77,126,232,0.25); border-radius: 100px; font: 500 12px/1 var(--lnd-f-ui); color: var(--lnd-accent-h); margin: 12px auto 0; }
 
   /* RESPONSIVE */
   @media (max-width: 960px) {
     .lnd-hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .lnd-roi-grid { grid-template-columns: 1fr; gap: 24px; }
     .lnd-hero-right { justify-content: flex-start; }
     .lnd-draw-card { max-width: 100%; }
     .lnd-hero-h1 { font-size: 38px; }
@@ -1985,7 +2064,7 @@ const CSS = `
   }
 
   /* ── PRICING NOTE ── */
-  .lnd-pricing-note { font: 400 13px/1.6 var(--lnd-f-mono); color: var(--lnd-t3); margin: -8px 0 0; }
+  .lnd-pricing-note { font: 400 13px/1.6 var(--lnd-f-ui); }
   .lnd-pricing-note strong { color: var(--lnd-t2); font-weight: 500; }
 
   /* ── FAQ ── */
@@ -1999,43 +2078,45 @@ const CSS = `
   .lnd-faq-item[open] .lnd-faq-chevron { transform: rotate(180deg); }
   .lnd-faq-a { padding: 0 20px 18px; font: 400 14px/1.7 var(--lnd-f-ui); color: var(--lnd-t2); margin: 0; }
 
-  /* ── KONTAKT-SEKTION ── */
-  .lnd-contact-wrap { padding: 80px 32px; border-top: 1px solid var(--lnd-rule); }
-  .lnd-contact-inner { max-width: 600px; margin: 0 auto; }
-  .lnd-contact-h2 { font: 700 36px/1.15 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 10px; letter-spacing: -0.02em; text-align: center; }
-  .lnd-contact-sub { font-size: 14px; color: var(--lnd-t2); text-align: center; margin: 0 0 36px; }
-  .lnd-contact-form { display: flex; flex-direction: column; gap: 16px; }
-  .lnd-contact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 520px) { .lnd-contact-row { grid-template-columns: 1fr; } }
-  .lnd-contact-form label {
-    display: flex; flex-direction: column; gap: 6px;
-    font: 500 13px/1 var(--lnd-f-ui); color: var(--lnd-t2);
+  /* ── KONTAKT-MODAL ── */
+  .lnd-modal-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(10,12,16,0.75); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; padding: 24px;
   }
-  .lnd-contact-form input,
-  .lnd-contact-form select,
-  .lnd-contact-form textarea {
+  .lnd-modal {
+    position: relative; background: #1E2128; border: 1px solid #2C303A;
+    border-radius: 16px; padding: 40px; width: 100%; max-width: 480px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  }
+  .lnd-modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none; color: #8E96A4; cursor: pointer; padding: 4px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; transition: color 0.15s, background 0.15s;
+  }
+  .lnd-modal-close:hover { color: #D8DCE4; background: rgba(255,255,255,0.06); }
+  .lnd-modal-form h2 { font: 600 22px/1.2 var(--lnd-f-ui); color: #ECEEF2; margin: 0 0 6px; }
+  .lnd-modal-sub { font: 400 14px/1.5 var(--lnd-f-ui); color: #8E96A4; margin: 0 0 24px; }
+  .lnd-modal-form label {
+    display: flex; flex-direction: column; gap: 6px;
+    font: 500 13px/1 var(--lnd-f-ui); color: #8E96A4; margin-bottom: 16px;
+  }
+  .lnd-modal-form input, .lnd-modal-form textarea {
     background: #15171C; border: 1px solid #2C303A; border-radius: 8px;
     color: #D8DCE4; font: 400 14px/1.5 var(--lnd-f-ui); padding: 10px 12px;
     outline: none; resize: vertical; transition: border-color 0.15s;
-    appearance: none; -webkit-appearance: none;
   }
-  .lnd-contact-form select {
-    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238E96A4' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer;
-  }
-  .lnd-contact-form input:focus,
-  .lnd-contact-form select:focus,
-  .lnd-contact-form textarea:focus { border-color: #6B8FBE; }
-  .lnd-contact-form input::placeholder, .lnd-contact-form textarea::placeholder { color: #44495A; }
-  .lnd-contact-error { font: 400 13px/1.5 var(--lnd-f-ui); color: #B85555; }
-  .lnd-contact-error a { color: #B85555; }
-  .lnd-contact-submit { align-self: flex-start; }
-  .lnd-contact-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-  .lnd-contact-success {
+  .lnd-modal-form input:focus, .lnd-modal-form textarea:focus { border-color: #6B8FBE; }
+  .lnd-modal-form input::placeholder, .lnd-modal-form textarea::placeholder { color: #44495A; }
+  .lnd-modal-error { font: 400 13px/1.5 var(--lnd-f-ui); color: #B85555; margin-bottom: 12px; }
+  .lnd-modal-form .lnd-btn-primary { width: 100%; justify-content: center; margin-top: 4px; }
+  .lnd-modal-form .lnd-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  .lnd-modal-success {
     display: flex; flex-direction: column; align-items: center; gap: 12px;
-    text-align: center; padding: 32px 0; color: #7A9C68;
+    text-align: center; padding: 16px 0; color: #7A9C68;
   }
-  .lnd-contact-success h3 { font: 600 20px/1.2 var(--lnd-f-ui); color: #ECEEF2; margin: 0; }
-  .lnd-contact-success p { font: 400 14px/1.5 var(--lnd-f-ui); color: #8E96A4; margin: 0 0 8px; }
-  .lnd-contact-success .lnd-btn-primary { margin-top: 8px; }
+  .lnd-modal-success h3 { font: 600 20px/1.2 var(--lnd-f-ui); color: #ECEEF2; margin: 0; }
+  .lnd-modal-success p { font: 400 14px/1.5 var(--lnd-f-ui); color: #8E96A4; margin: 0 0 8px; }
+  .lnd-modal-success .lnd-btn-primary { margin-top: 8px; }
 `;
