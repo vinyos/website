@@ -1,50 +1,37 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: SITE_TITLE,
-    template: `%s — ${SITE_NAME}`,
-  },
-  description: SITE_DESCRIPTION,
-  keywords: [
-    "CNC Kalkulation",
-    "Drehteile Angebot",
-    "Lohnfertigung",
-    "Angebotskalkulation",
-    "KI Zeichnungsanalyse",
-    "Zerspanung",
-  ],
+  title: "Vinyos Quote – KI-Kalkulation für CNC-Drehteile | Angebot in 60 Sekunden",
+  description: "Vinyos Quote analysiert Ihre Zeichnung (PDF + STEP) automatisch und kalkuliert Drehteile in unter 60 Sekunden — mit Ihren Stundensätzen, 84 Werkstoffen und 14 GD&T-Toleranzen. Kostenlos testen.",
   openGraph: {
-    type: "website",
+    title: "Vinyos Quote – KI-Kalkulation für CNC-Drehteile",
+    description: "Zeichnung rein. Präziser Preis raus. In unter 60 Sekunden — deterministisch kalkuliert mit Ihren Stundensätzen. 10 Anfragen kostenlos testen.",
+    url: "https://vinyos.de",
+    siteName: "Vinyos Quote",
     locale: "de_DE",
-    siteName: SITE_NAME,
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    url: SITE_URL,
+    type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
+    title: "Vinyos Quote – KI-Kalkulation für CNC-Drehteile",
+    description: "Zeichnung rein. Präziser Preis raus. In unter 60 Sekunden. 10 Anfragen kostenlos testen.",
   },
-  robots: { index: true, follow: true },
+  alternates: {
+    canonical: "https://vinyos.de",
+  },
+  keywords: ["CNC Drehteile kalkulieren", "Angebotskalkulation Lohnfertigung", "Drehteil Kalkulation Software", "CNC Kalkulation Software", "Drehteile Angebot erstellen"],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* Produkt-Analytics (datensparsam, keine PII / Custom-Events). */}
+        <Analytics />
+      </body>
     </html>
   );
 }
