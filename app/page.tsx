@@ -574,7 +574,13 @@ function PartViewer() {
 
 export default function LandingPage() {
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.vinyos.de";
-  const go = () => { window.location.href = `${APP_URL}/login`; };
+  const go = (next?: string) => {
+    window.location.href = next
+      ? `${APP_URL}/login?next=${encodeURIComponent(next)}`
+      : `${APP_URL}/login`;
+  };
+  const goPlan = (plan: "starter" | "pro" | "enterprise", mode: "trial" | "direct") =>
+    go(`/einstellungen/tarif?plan=${plan}&mode=${mode}`);
 
   const heroRef = useRef<HTMLElement>(null);
   const [heroIn, setHeroIn] = useState(false);
@@ -654,7 +660,7 @@ export default function LandingPage() {
               <a href="#preise" className="lnd-nav-link">Preise</a>
               <a href="#kontakt" className="lnd-nav-link">Kontakt</a>
             </div>
-            <button className="lnd-btn-nav" onClick={go}>Kostenlos testen</button>
+            <button className="lnd-btn-nav" onClick={() => go()}>Kostenlos testen</button>
             <button
               className="lnd-nav-burger"
               aria-label={navOpen ? "Menü schließen" : "Menü öffnen"}
@@ -698,7 +704,7 @@ export default function LandingPage() {
                   Für CNC-Lohnfertiger im DACH-Raum: Zeichnung (PDF + STEP) hochladen, Geometrie und Toleranzen werden automatisch erkannt — und ein präziser Angebotspreis mit Ihren Stundensätzen berechnet.
                 </p>
                 <div className="lnd-hero-cta">
-                  <button className="lnd-btn-primary" onClick={go}>
+                  <button className="lnd-btn-primary" onClick={() => go()}>
                     Kostenlos testen
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
                   </button>
@@ -1018,8 +1024,9 @@ export default function LandingPage() {
               <div className="lnd-label">Preise</div>
               <h2 className="lnd-section-h2">Transparent. Ohne Überraschungen.</h2>
               <p className="lnd-section-lead">
-                Erster Monat gratis, danach ein fester Monatstarif mit inklusivem
-                Anfrage-Kontingent. Eine manuelle Kalkulation kostet Sie ein Vielfaches an Arbeitszeit.
+                Starter einen Monat gratis testen, danach ein fester Monatstarif mit
+                inklusivem Anfrage-Kontingent. Pro und Enterprise direkt buchbar.
+                Eine manuelle Kalkulation kostet Sie ein Vielfaches an Arbeitszeit.
               </p>
               <p className="lnd-pricing-note">Eine <strong>Anfrage</strong> = ein Teil (ein PDF + STEP-Paar). Staffelkalkulationen für mehrere Stückzahlen zählen als eine Anfrage.</p>
             </Reveal>
@@ -1031,7 +1038,10 @@ export default function LandingPage() {
                   <div className="lnd-plan-price"><span className="lnd-plan-amount">189 €</span><span className="lnd-plan-period">/ Monat</span></div>
                   <p className="lnd-plan-sub">150 Anfragen/Monat · 1. Monat kostenfrei · monatlich kündbar.</p>
                 </div>
-                <button className="lnd-plan-btn" onClick={go}>1. Monat gratis starten</button>
+                <div className="lnd-plan-cta">
+                  <button className="lnd-plan-btn lnd-plan-btn--featured" onClick={() => goPlan("starter", "trial")}>Gratis testen</button>
+                  <button className="lnd-plan-btn" onClick={() => goPlan("starter", "direct")}>Direkt buchen</button>
+                </div>
                 <ul className="lnd-plan-items">
                   <PlanItem on>1. Monat kostenfrei</PlanItem>
                   <PlanItem on>150 Anfragen / Monat inklusive</PlanItem>
@@ -1048,11 +1058,12 @@ export default function LandingPage() {
                 <div className="lnd-plan-head">
                   <div className="lnd-plan-name">Pro</div>
                   <div className="lnd-plan-price"><span className="lnd-plan-amount">349 €</span><span className="lnd-plan-period">/ Monat</span></div>
-                  <p className="lnd-plan-sub">350 Anfragen/Monat · effektiv 1,00 € pro Anfrage · 1. Monat gratis.</p>
+                  <p className="lnd-plan-sub">350 Anfragen/Monat · effektiv 1,00 € pro Anfrage · monatlich kündbar.</p>
                 </div>
-                <button className="lnd-plan-btn lnd-plan-btn--featured" onClick={go}>1. Monat gratis starten</button>
+                <div className="lnd-plan-cta">
+                  <button className="lnd-plan-btn lnd-plan-btn--featured" onClick={() => goPlan("pro", "direct")}>Direkt buchen</button>
+                </div>
                 <ul className="lnd-plan-items">
-                  <PlanItem on>1. Monat kostenfrei</PlanItem>
                   <PlanItem on>350 Anfragen / Monat inklusive</PlanItem>
                   <PlanItem on>Weitere Anfragen: 1,00 €</PlanItem>
                   <PlanItem on>Vollständige KI-Analyse</PlanItem>
@@ -1066,11 +1077,12 @@ export default function LandingPage() {
                 <div className="lnd-plan-head">
                   <div className="lnd-plan-name">Enterprise</div>
                   <div className="lnd-plan-price"><span className="lnd-plan-amount">579 €</span><span className="lnd-plan-period">/ Monat</span></div>
-                  <p className="lnd-plan-sub">700 Anfragen/Monat · effektiv 0,83 € pro Anfrage · 1. Monat gratis.</p>
+                  <p className="lnd-plan-sub">700 Anfragen/Monat · effektiv 0,83 € pro Anfrage · monatlich kündbar.</p>
                 </div>
-                <button className="lnd-plan-btn" onClick={go}>1. Monat gratis starten</button>
+                <div className="lnd-plan-cta">
+                  <button className="lnd-plan-btn lnd-plan-btn--featured" onClick={() => goPlan("enterprise", "direct")}>Direkt buchen</button>
+                </div>
                 <ul className="lnd-plan-items">
-                  <PlanItem on>1. Monat kostenfrei</PlanItem>
                   <PlanItem on>700 Anfragen / Monat inklusive</PlanItem>
                   <PlanItem on>Weitere Anfragen: 1,00 €</PlanItem>
                   <PlanItem on>Vollständige KI-Analyse</PlanItem>
@@ -1136,7 +1148,7 @@ export default function LandingPage() {
               <h2 className="lnd-cta-h2">In Sekunden zum ersten<br />kalkulierten Teil.</h2>
               <p className="lnd-cta-sub">1. Monat gratis — keine Kreditkarte, keine Einrichtung.</p>
               <div className="lnd-cta-actions">
-                <button className="lnd-btn-primary" onClick={go}>
+                <button className="lnd-btn-primary" onClick={() => go()}>
                   Kostenlos testen
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
                 </button>
@@ -1220,7 +1232,7 @@ export default function LandingPage() {
         <div className="lnd-sticky-cta" data-show={heroPassed && !navOpen}>
           <div className="lnd-sticky-cta-inner">
             <span className="lnd-sticky-cta-txt">1. Monat gratis testen</span>
-            <button className="lnd-btn-primary" onClick={go}>
+            <button className="lnd-btn-primary" onClick={() => go()}>
               Starten
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
             </button>
@@ -1810,10 +1822,13 @@ const CSS = `
   .lnd-plan-usage--accent .lnd-plan-usage-val { color: var(--lnd-accent); }
   .lnd-plan-usage-lab { font: 500 11px/1.3 var(--lnd-f-mono); color: var(--lnd-t2); }
   .lnd-plan-sub { font-size: 12px; color: var(--lnd-t3); margin: 0; line-height: 1.5; }
-  .lnd-plan-btn { width: 100%; height: 40px; background: transparent; border: 1px solid var(--lnd-border-s); color: var(--lnd-t1); border-radius: 2px; font: 500 13px/1 var(--lnd-f-ui); cursor: pointer; margin-bottom: 24px; transition: border-color 120ms, color 120ms; }
-  .lnd-plan-btn:hover { border-color: var(--lnd-accent); color: var(--lnd-tx); }
+  .lnd-plan-cta { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+  .lnd-plan-btn { width: 100%; height: 40px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--lnd-border-s); color: var(--lnd-t1); border-radius: 2px; font: 500 13px/1 var(--lnd-f-ui); cursor: pointer; transition: background 120ms, border-color 120ms, color 120ms, transform 120ms; }
+  .lnd-plan-btn:hover { border-color: var(--lnd-accent); color: var(--lnd-tx); transform: translateY(-1px); }
   .lnd-plan-btn--featured { background: var(--lnd-accent); border-color: var(--lnd-accent); color: #fff; }
-  .lnd-plan-btn--featured:hover { background: var(--lnd-accent-h); border-color: var(--lnd-accent-h); }
+  .lnd-plan-btn--featured:hover { background: var(--lnd-accent-h); border-color: var(--lnd-accent-h); color: #fff; }
+  .lnd-plan-btn--ghost-featured { background: transparent; border-color: var(--lnd-accent-b); color: var(--lnd-accent); }
+  .lnd-plan-btn--ghost-featured:hover { border-color: var(--lnd-accent); color: var(--lnd-accent); }
   .lnd-plan-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
   .lnd-plan-item { display: flex; align-items: center; gap: 10px; font-size: 13px; }
   .lnd-plan-item--on { color: var(--lnd-t1); }
