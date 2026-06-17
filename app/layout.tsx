@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "Vinyos Quote analysiert Ihre Zeichnung (PDF + STEP) automatisch und kalkuliert Drehteile in unter 60 Sekunden — mit Ihren Stundensätzen, 84 Werkstoffen und 14 GD&T-Toleranzen. Kostenlos testen.",
   openGraph: {
     title: "Vinyos Quote – KI-Kalkulation für CNC-Drehteile",
-    description: "Zeichnung rein. Präziser Preis raus. In unter 60 Sekunden — deterministisch kalkuliert mit Ihren Stundensätzen. 10 Anfragen kostenlos testen.",
+    description: "Zeichnung rein. Präziser Preis raus. In unter 60 Sekunden — deterministisch kalkuliert mit Ihren Stundensätzen. 1. Monat gratis testen.",
     url: "https://vinyos.de",
     siteName: "Vinyos Quote",
     locale: "de_DE",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Vinyos Quote – KI-Kalkulation für CNC-Drehteile",
-    description: "Zeichnung rein. Präziser Preis raus. In unter 60 Sekunden. 10 Anfragen kostenlos testen.",
+    description: "Zeichnung rein. Präziser Preis raus. In unter 60 Sekunden. 1. Monat gratis testen.",
   },
   alternates: {
     canonical: "https://vinyos.de",
