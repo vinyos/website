@@ -51,15 +51,15 @@ export default function Impressum() {
 }
 
 const CSS = `
-  html, body { background: #080B10; }
-  .legal-root { min-height: 100vh; background: #080B10; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #E8EDF4; -webkit-font-smoothing: antialiased; }
+  html, body { background: var(--color-base); }
+  .legal-root { min-height: 100vh; background: var(--color-base); font-family: 'Lora', Georgia, serif; color: var(--color-text); -webkit-font-smoothing: antialiased; }
   .legal-inner { max-width: 720px; margin: 0 auto; padding: 64px 32px 96px; }
-  .legal-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #4F5A6A; text-decoration: none; margin-bottom: 40px; transition: color 120ms; }
-  .legal-back:hover { color: #E8EDF4; }
-  .legal-h1 { font: 700 32px/1.2 'IBM Plex Sans',system-ui,sans-serif; color: #F4F7FB; margin: 0 0 48px; letter-spacing: -0.02em; }
+  .legal-back { display: inline-flex; align-items: center; gap: 6px; font-family: 'Poppins',system-ui,sans-serif; font-size: 13px; color: var(--color-text-muted); text-decoration: none; margin-bottom: 40px; transition: color 120ms; }
+  .legal-back:hover { color: var(--color-accent-text); }
+  .legal-h1 { font: 700 32px/1.2 'Poppins',system-ui,sans-serif; color: var(--color-text); margin: 0 0 48px; letter-spacing: -0.02em; }
   .legal-section { margin-bottom: 40px; }
-  .legal-section h2 { font: 600 15px/1.3 'IBM Plex Sans',system-ui,sans-serif; color: #6B8FBE; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
-  .legal-section p { font: 400 15px/1.7 'IBM Plex Sans',system-ui,sans-serif; color: #A8B3C4; margin: 0; }
-  .legal-section a { color: #6B8FBE; text-decoration: none; }
-  .legal-section a:hover { color: #88A6CE; text-decoration: underline; }
+  .legal-section h2 { font: 600 15px/1.3 'Poppins',system-ui,sans-serif; color: var(--color-accent-text); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
+  .legal-section p { font: 400 15px/1.7 'Lora',Georgia,serif; color: var(--color-text-secondary); margin: 0; }
+  .legal-section a { color: var(--color-accent-text); text-decoration: none; }
+  .legal-section a:hover { color: var(--color-accent-hover); text-decoration: underline; }
 `;
