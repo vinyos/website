@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 /* ────────────────────────────────────────────────
    Scroll-Reveal
@@ -263,7 +264,7 @@ function Profile2D({ mode }: { mode: "profil" | "explosion" }) {
   pp += " Z";
 
   const Arrow = (x: number, y: number, dir: 1 | -1) => (
-    <path d={`M ${x} ${y} l ${dir * 5} -2.6 l 0 5.2 Z`} fill="#8892A0" />
+    <path d={`M ${x} ${y} l ${dir * 5} -2.6 l 0 5.2 Z`} style={{ fill: "var(--lnd-t2)" }} />
   );
 
   // ⌀-Bemaßung mit Hinweislinie (Toleranz in Kupfer hervorgehoben)
@@ -273,11 +274,11 @@ function Profile2D({ mode }: { mode: "profil" | "explosion" }) {
     const tx = ex + (anchor === "start" ? 5 : -5);
     return (
       <g key={`d${b.x0}`} fontFamily="IBM Plex Mono, monospace">
-        <line x1={sx} y1={sy} x2={ex} y2={ey} stroke="#4D7EE8" strokeWidth={0.7} />
-        <circle cx={sx} cy={sy} r={1.7} fill="#4D7EE8" />
-        <text x={tx} y={ey + 3.5} textAnchor={anchor} fontSize={12.5} fill="#E8EDF4">
+        <line x1={sx} y1={sy} x2={ex} y2={ey} style={{ stroke: "var(--lnd-accent)" }} strokeWidth={0.7} />
+        <circle cx={sx} cy={sy} r={1.7} style={{ fill: "var(--lnd-accent)" }} />
+        <text x={tx} y={ey + 3.5} textAnchor={anchor} fontSize={12.5} style={{ fill: "var(--lnd-t1)" }}>
           ⌀{b.dia}
-          {b.tol && <tspan dx={4} fontSize={10.5} fill="#6B96EF">{b.tol}</tspan>}
+          {b.tol && <tspan dx={4} fontSize={10.5} style={{ fill: "var(--lnd-accent-h)" }}>{b.tol}</tspan>}
         </text>
       </g>
     );
@@ -287,37 +288,37 @@ function Profile2D({ mode }: { mode: "profil" | "explosion" }) {
     <svg viewBox={`0 0 ${VW} ${VH}`} className="lnd-p2d-svg" preserveAspectRatio="xMidYMid meet">
       <defs>
         <pattern id="lnd-hatch" patternUnits="userSpaceOnUse" width={6} height={6}>
-          <line x1={0} y1={6} x2={6} y2={0} stroke="#2A3650" strokeWidth={0.7} />
+          <line x1={0} y1={6} x2={6} y2={0} style={{ stroke: "var(--lnd-border-s)" }} strokeWidth={0.7} />
         </pattern>
         <linearGradient id="lnd-seg-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#1A2435" />
-          <stop offset="50%" stopColor="#141B28" />
-          <stop offset="100%" stopColor="#0F1420" />
+          <stop offset="0%" style={{ stopColor: "var(--lnd-surface)" }} />
+          <stop offset="50%" style={{ stopColor: "var(--lnd-bg-alt)" }} />
+          <stop offset="100%" style={{ stopColor: "var(--lnd-bg-alt)" }} />
         </linearGradient>
         <clipPath id="lnd-prof-clip"><path d={pp} /></clipPath>
       </defs>
 
       {/* Rotationsachse (Strich-Punkt) */}
       <line x1={firstX - 26} y1={CY} x2={lastX + 26} y2={CY}
-        stroke="#2E3848" strokeWidth={0.8} strokeDasharray="9 3 2 3" />
+        style={{ stroke: "var(--lnd-t4)" }} strokeWidth={0.8} strokeDasharray="9 3 2 3" />
 
       {explosion ? (
         boxes.map((b, i) => (
           <g key={i} style={{ opacity: 0, animation: `lnd-fade 0.5s ${0.05 + i * 0.07}s ease-out forwards` }}>
             <rect x={b.x0} y={CY - b.rr} width={b.w} height={b.rr * 2} fill="url(#lnd-seg-grad)" />
             <rect x={b.x0} y={CY - b.rr} width={b.w} height={b.rr * 2} fill="url(#lnd-hatch)" />
-            <rect x={b.x0} y={CY - b.rr} width={b.w} height={b.rr * 2} fill="none" stroke="#4D7EE8" strokeWidth={1.2} />
-            <ellipse cx={b.x1} cy={CY} rx={2.6} ry={b.rr} fill="#2E3848" stroke="#4D7EE8" strokeWidth={0.8} />
+            <rect x={b.x0} y={CY - b.rr} width={b.w} height={b.rr * 2} fill="none" style={{ stroke: "var(--lnd-accent)" }} strokeWidth={1.2} />
+            <ellipse cx={b.x1} cy={CY} rx={2.6} ry={b.rr} style={{ fill: "var(--lnd-t4)", stroke: "var(--lnd-accent)" }} strokeWidth={0.8} />
             {/* Länge oben */}
-            <g fontFamily="IBM Plex Mono, monospace" fontSize={10.5} fill="#8892A0">
-              <line x1={b.x0} y1={CY - b.rr - 12} x2={b.x1} y2={CY - b.rr - 12} stroke="#4F5A6A" strokeWidth={0.6} />
+            <g fontFamily="IBM Plex Mono, monospace" fontSize={10.5} style={{ fill: "var(--lnd-t2)" }}>
+              <line x1={b.x0} y1={CY - b.rr - 12} x2={b.x1} y2={CY - b.rr - 12} style={{ stroke: "var(--lnd-t3)" }} strokeWidth={0.6} />
               {Arrow(b.x0, CY - b.rr - 12, 1)}{Arrow(b.x1, CY - b.rr - 12, -1)}
               <text x={(b.x0 + b.x1) / 2} y={CY - b.rr - 17} textAnchor="middle">{b.len}</text>
             </g>
             {/* ⌀ + Toleranz unten */}
             <text x={(b.x0 + b.x1) / 2} y={CY + b.rr + 18} textAnchor="middle"
-              fontFamily="IBM Plex Mono, monospace" fontSize={11} fill="#E8EDF4">
-              ⌀{b.dia}{b.tol && <tspan dx={3} fontSize={9.5} fill="#6B96EF">{b.tol}</tspan>}
+              fontFamily="IBM Plex Mono, monospace" fontSize={11} style={{ fill: "var(--lnd-t1)" }}>
+              ⌀{b.dia}{b.tol && <tspan dx={3} fontSize={9.5} style={{ fill: "var(--lnd-accent-h)" }}>{b.tol}</tspan>}
             </text>
           </g>
         ))
@@ -325,9 +326,9 @@ function Profile2D({ mode }: { mode: "profil" | "explosion" }) {
         <g style={{ opacity: 0, animation: "lnd-fade 0.6s 0.05s ease-out forwards" }}>
           <path d={pp} fill="url(#lnd-seg-grad)" />
           <rect x={0} y={0} width={VW} height={VH} fill="url(#lnd-hatch)" clipPath="url(#lnd-prof-clip)" />
-          <path d={pp} fill="none" stroke="#4D7EE8" strokeWidth={1.3} strokeLinejoin="miter" />
-          <ellipse cx={firstX} cy={CY} rx={3} ry={boxes[0].rr} fill="#2E3848" stroke="#4D7EE8" strokeWidth={0.8} />
-          <ellipse cx={lastX} cy={CY} rx={2.4} ry={boxes[boxes.length - 1].rr} fill="#2E3848" stroke="#4D7EE8" strokeWidth={0.8} />
+          <path d={pp} fill="none" style={{ stroke: "var(--lnd-accent)" }} strokeWidth={1.3} strokeLinejoin="miter" />
+          <ellipse cx={firstX} cy={CY} rx={3} ry={boxes[0].rr} style={{ fill: "var(--lnd-t4)", stroke: "var(--lnd-accent)" }} strokeWidth={0.8} />
+          <ellipse cx={lastX} cy={CY} rx={2.4} ry={boxes[boxes.length - 1].rr} style={{ fill: "var(--lnd-t4)", stroke: "var(--lnd-accent)" }} strokeWidth={0.8} />
         </g>
       )}
 
@@ -344,20 +345,20 @@ function Profile2D({ mode }: { mode: "profil" | "explosion" }) {
           {(() => {
             const dy = CY + maxDia / 2 * sc + 40;
             return (
-              <g fontFamily="IBM Plex Mono, monospace" fontSize={10.5} fill="#8892A0">
+              <g fontFamily="IBM Plex Mono, monospace" fontSize={10.5} style={{ fill: "var(--lnd-t2)" }}>
                 {boxes.map((b, i) => (
                   <g key={i}>
-                    <line x1={b.x0} y1={CY + b.rr} x2={b.x0} y2={dy + 5} stroke="#2E3848" strokeWidth={0.5} />
-                    <line x1={b.x0} y1={dy} x2={b.x1} y2={dy} stroke="#4F5A6A" strokeWidth={0.6} />
+                    <line x1={b.x0} y1={CY + b.rr} x2={b.x0} y2={dy + 5} style={{ stroke: "var(--lnd-t4)" }} strokeWidth={0.5} />
+                    <line x1={b.x0} y1={dy} x2={b.x1} y2={dy} style={{ stroke: "var(--lnd-t3)" }} strokeWidth={0.6} />
                     {Arrow(b.x0, dy, 1)}{Arrow(b.x1, dy, -1)}
                     <text x={(b.x0 + b.x1) / 2} y={dy - 5} textAnchor="middle">{b.len}</text>
                   </g>
                 ))}
-                <line x1={lastX} y1={CY + boxes[boxes.length - 1].rr} x2={lastX} y2={dy + 5} stroke="#2E3848" strokeWidth={0.5} />
+                <line x1={lastX} y1={CY + boxes[boxes.length - 1].rr} x2={lastX} y2={dy + 5} style={{ stroke: "var(--lnd-t4)" }} strokeWidth={0.5} />
                 {/* Gesamtlänge */}
-                <line x1={firstX} y1={dy + 22} x2={lastX} y2={dy + 22} stroke="#8892A0" strokeWidth={0.7} />
+                <line x1={firstX} y1={dy + 22} x2={lastX} y2={dy + 22} style={{ stroke: "var(--lnd-t2)" }} strokeWidth={0.7} />
                 {Arrow(firstX, dy + 22, 1)}{Arrow(lastX, dy + 22, -1)}
-                <text x={(firstX + lastX) / 2} y={dy + 17} textAnchor="middle" fontSize={11.5} fill="#E8EDF4">{total}</text>
+                <text x={(firstX + lastX) / 2} y={dy + 17} textAnchor="middle" fontSize={11.5} style={{ fill: "var(--lnd-t1)" }}>{total}</text>
               </g>
             );
           })()}
@@ -366,11 +367,37 @@ function Profile2D({ mode }: { mode: "profil" | "explosion" }) {
 
       {/* Label */}
       <text x={VW / 2} y={VH - 8} textAnchor="middle"
-        fontFamily="IBM Plex Mono, monospace" fontSize={9} fill="#4F5A6A" letterSpacing={2}>
+        fontFamily="IBM Plex Mono, monospace" fontSize={9} style={{ fill: "var(--lnd-t3)" }} letterSpacing={2}>
         {explosion ? "EXPLOSIONSANSICHT" : "SCHNITTANSICHT · A–A"}
       </text>
     </svg>
   );
+}
+
+/* 3D-Hero-Farben (Three.js liest kein CSS — Werte spiegeln die Light/Petrol-Palette).
+   Warme, helle Szene; anthrazit-getöntes Metall, das auf Off-White (#faf9f5) liest;
+   Petrol-Akzent (#3f7d7b) für Kanten/Rim. */
+// JS kann keine CSS-Variablen lesen → Farb-Sets für beide Themes hier gespiegelt.
+const HERO3D_LIGHT = {
+  partMetal:   0xb8b6ad, // helles, warm-neutrales Metall (zwischen --lnd-t4 #b0aea5 und Surface)
+  accent:      0x3f7d7b, // --lnd-accent (Profil-Kanten + Rim-Licht)
+  ambient:     0xfaf9f5, // --lnd-bg, warmes Umgebungslicht
+  keyLight:    0xfffdf6, // warmes Weiß (Key)
+  fillLight:   0xe9e6da, // --lnd-bg-alt-artiges weiches Fülllicht
+} as const;
+const HERO3D_DARK = {
+  partMetal:   0x9fb0c8, // kühler, mittlerer Stahl — liest auf #141413
+  accent:      0x6fb3b1, // --lnd-accent (dark) für Profil-Kanten + Rim-Licht
+  ambient:     0x20242b, // dunkles, leicht kühles Umgebungslicht
+  keyLight:    0xcdd6e4, // kühles Key-Licht
+  fillLight:   0x2a2f38, // gedämpftes kühles Fülllicht
+} as const;
+type Hero3DColors = Record<keyof typeof HERO3D_LIGHT, number>;
+function hero3dColors(): Hero3DColors {
+  const dark =
+    typeof document !== "undefined" &&
+    document.documentElement.getAttribute("data-theme") === "dark";
+  return dark ? HERO3D_DARK : HERO3D_LIGHT;
 }
 
 function PartViewer() {
@@ -409,23 +436,27 @@ function PartViewer() {
         const H = host.clientHeight || 460;
         const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+        let HERO3D = hero3dColors();
         const scene = new THREE.Scene();
-        const steel = new THREE.MeshStandardMaterial({ color: 0x9fb0c8, metalness: 0.82, roughness: 0.34 });
-        const accent = new THREE.Color(0x6b96ef);
+        const steel = new THREE.MeshStandardMaterial({ color: HERO3D.partMetal, metalness: 0.72, roughness: 0.42 });
+        const accent = new THREE.Color(HERO3D.accent);
 
         // Stufenwelle als einzelne Segmente { Länge, Radius } — geteilt mit der 2D-Ansicht
         const segs = DEMO_SEGS.map(s => ({ l: s.len, r: s.dia / 2 }));
         const total = segs.reduce((a, s) => a + s.l, 0);
         const part = new THREE.Group();
         const subs: InstanceType<typeof THREE.Group>[] = [];
+        const edgeMats: InstanceType<typeof THREE.LineBasicMaterial>[] = [];
         let cx = -total / 2;
         segs.forEach((s, i) => {
           const geo = new THREE.CylinderGeometry(s.r, s.r, s.l, 56);
           geo.rotateZ(Math.PI / 2);
           const mesh = new THREE.Mesh(geo, steel);
+          const edgeMat = new THREE.LineBasicMaterial({ color: accent });
+          edgeMats.push(edgeMat);
           const edges = new THREE.LineSegments(
             new THREE.EdgesGeometry(geo, 18),
-            new THREE.LineBasicMaterial({ color: accent })
+            edgeMat
           );
           edges.visible = false;
           const sub = new THREE.Group();
@@ -448,7 +479,7 @@ function PartViewer() {
         renderer.setSize(W, H);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.5;
+        renderer.toneMappingExposure = 1.15;
         host.appendChild(renderer.domElement);
 
         const controls = new OrbitControls(cam, renderer.domElement);
@@ -460,13 +491,32 @@ function PartViewer() {
         controls.minDistance = total * 0.7;
         controls.maxDistance = total * 2.6;
 
-        scene.add(new THREE.AmbientLight(0xbcc8dc, 2.2));
-        const key = new THREE.DirectionalLight(0xffffff, 3.0);
+        const ambient = new THREE.AmbientLight(HERO3D.ambient, 2.4);
+        scene.add(ambient);
+        const key = new THREE.DirectionalLight(HERO3D.keyLight, 2.8);
         key.position.set(total, total * 1.4, total);
         scene.add(key);
-        const rim = new THREE.DirectionalLight(0x4d7ee8, 2.6);
+        const fill = new THREE.DirectionalLight(HERO3D.fillLight, 1.4);
+        fill.position.set(total * 0.6, total * 0.8, -total);
+        scene.add(fill);
+        const rim = new THREE.DirectionalLight(HERO3D.accent, 1.6);
         rim.position.set(-total, -total * 0.4, -total * 0.5);
         scene.add(rim);
+
+        // Theme-Wechsel live übernehmen (JS liest keine CSS-Vars → Farb-Set neu wählen).
+        const applyTheme = () => {
+          HERO3D = hero3dColors();
+          steel.color.set(HERO3D.partMetal);
+          accent.set(HERO3D.accent);
+          edgeMats.forEach((m) => m.color.set(HERO3D.accent));
+          ambient.color.set(HERO3D.ambient);
+          key.color.set(HERO3D.keyLight);
+          fill.color.set(HERO3D.fillLight);
+          rim.color.set(HERO3D.accent);
+        };
+        window.addEventListener("themechange", applyTheme);
+        const themeObserver = new MutationObserver(applyTheme);
+        themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
         const applyMode = (m: ViewMode) => {
           subs.forEach((sub) => {
@@ -509,6 +559,8 @@ function PartViewer() {
         cleanup = () => {
           cancelAnimationFrame(raf);
           window.removeEventListener("resize", onResize);
+          window.removeEventListener("themechange", applyTheme);
+          themeObserver.disconnect();
           controls.dispose();
           renderer.dispose();
           if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement);
@@ -660,6 +712,7 @@ export default function LandingPage() {
               <a href="#preise" className="lnd-nav-link">Preise</a>
               <a href="#kontakt" className="lnd-nav-link">Kontakt</a>
             </div>
+            <ThemeToggle />
             <button className="lnd-btn-nav" onClick={() => go()}>Kostenlos testen</button>
             <button
               className="lnd-nav-burger"
@@ -1343,26 +1396,52 @@ const FEATURES = [
 
 const CSS = `
   :root {
-    --lnd-bg:        #080B10;
-    --lnd-bg-alt:    #0C1018;
-    --lnd-surface:   #0F1420;
-    --lnd-elevated:  #141B28;
-    --lnd-border:    #1C2535;
-    --lnd-border-s:  #2A3650;
-    --lnd-rule:      #1C2535;
-    --lnd-accent:    #4D7EE8;
-    --lnd-accent-h:  #6B96EF;
-    --lnd-accent-bg: rgba(77,126,232,0.08);
-    --lnd-accent-b:  rgba(77,126,232,0.22);
-    --lnd-t1:        #E8EDF4;
-    --lnd-t2:        #8892A0;
-    --lnd-t3:        #4F5A6A;
-    --lnd-t4:        #2E3848;
-    --lnd-tx:        #F4F7FB;
-    --lnd-success:   #4CAF7D;
-    --lnd-f-display: 'Manrope','IBM Plex Sans',system-ui,sans-serif;
-    --lnd-f-ui:      'IBM Plex Sans',system-ui,sans-serif;
+    --lnd-bg:        #faf9f5;
+    --lnd-bg-alt:    #f4f2ea;
+    --lnd-surface:   #ffffff;
+    --lnd-elevated:  #ffffff;
+    --lnd-border:    #e8e6dc;
+    --lnd-border-s:  #b0aea5;
+    --lnd-rule:      #e8e6dc;
+    --lnd-accent:    #3f7d7b;
+    --lnd-accent-h:  #336463;
+    --lnd-accent-rgb: 63 125 123;
+    --lnd-bg-rgb:     250 249 245;
+    --lnd-danger:     #b3534c;
+    --lnd-danger-rgb: 179 83 76;
+    --lnd-accent-bg: rgb(var(--lnd-accent-rgb) / 0.08);
+    --lnd-accent-b:  rgb(var(--lnd-accent-rgb) / 0.22);
+    --lnd-t1:        #141413;
+    --lnd-t2:        #57564f;
+    --lnd-t3:        #8a8980;
+    --lnd-t4:        #b0aea5;
+    --lnd-tx:        #141413;
+    --lnd-success:   #788c5d;
+    --lnd-f-display: 'Poppins','IBM Plex Sans',system-ui,sans-serif;
+    --lnd-f-ui:      'Poppins','IBM Plex Sans',system-ui,sans-serif;
+    --lnd-f-body:    'Lora',Georgia,serif;
     --lnd-f-mono:    'IBM Plex Mono',ui-monospace,monospace;
+  }
+  :root[data-theme="dark"] {
+    --lnd-bg:        #141413;
+    --lnd-bg-alt:    #1f1e1c;
+    --lnd-surface:   #1f1e1c;
+    --lnd-elevated:  #26241f;
+    --lnd-border:    #2a2926;
+    --lnd-border-s:  #3a3833;
+    --lnd-rule:      #2a2926;
+    --lnd-accent:    #6fb3b1;
+    --lnd-accent-h:  #8cc5c3;
+    --lnd-accent-rgb: 111 179 177;
+    --lnd-bg-rgb:     20 20 19;
+    --lnd-danger:     #cf6b63;
+    --lnd-danger-rgb: 207 107 99;
+    --lnd-t1:        #faf9f5;
+    --lnd-t2:        #c4c2b8;
+    --lnd-t3:        #8a8980;
+    --lnd-t4:        #57564f;
+    --lnd-tx:        #faf9f5;
+    --lnd-success:   #9ab87a;
   }
   html, body { background: var(--lnd-bg); scroll-behavior: smooth; }
   .lnd-root {
@@ -1388,7 +1467,7 @@ const CSS = `
   /* NAV */
   .lnd-nav {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(8,11,16,0.88);
+    background: rgb(var(--lnd-bg-rgb) /0.88);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--lnd-rule);
   }
@@ -1424,7 +1503,7 @@ const CSS = `
     font: 600 14px/1 var(--lnd-f-ui); cursor: pointer; white-space: nowrap;
     transition: background 120ms, transform 120ms, box-shadow 120ms;
   }
-  .lnd-btn-primary:hover { background: var(--lnd-accent-h); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(77,126,232,0.25); }
+  .lnd-btn-primary:hover { background: var(--lnd-accent-h); transform: translateY(-1px); box-shadow: 0 8px 24px rgb(var(--lnd-accent-rgb) /0.25); }
   .lnd-btn-outline {
     display: inline-flex; align-items: center; height: 36px; padding: 0 16px;
     background: transparent; border: 1px solid var(--lnd-border-s); color: var(--lnd-t1);
@@ -1444,6 +1523,14 @@ const CSS = `
     transition: background 120ms;
   }
   .lnd-btn-nav:hover { background: var(--lnd-accent-h); }
+  .lnd-theme-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: transparent; border: 0; border-radius: 2px;
+    color: var(--lnd-t2); cursor: pointer;
+    transition: color 120ms, background 120ms;
+  }
+  .lnd-theme-toggle:hover { color: var(--lnd-accent); background: var(--lnd-accent-bg); }
   .lnd-btn-ghost {
     display: inline-flex; align-items: center; height: 44px; padding: 0 16px;
     color: var(--lnd-t2); font: 500 14px/1 var(--lnd-f-ui); text-decoration: none; transition: color 120ms;
@@ -1462,7 +1549,7 @@ const CSS = `
     100% { left: calc(100% - 2px); opacity: 0; }
   }
   @keyframes de-on {
-    to { color: var(--lnd-accent); filter: drop-shadow(0 0 5px rgba(77,126,232,0.7)); }
+    to { color: var(--lnd-accent); filter: drop-shadow(0 0 5px rgb(var(--lnd-accent-rgb) /0.7)); }
   }
   @keyframes chip-in {
     0%   { opacity: 0; transform: translateY(8px) scale(0.92); }
@@ -1479,12 +1566,12 @@ const CSS = `
   .lnd-hero--visible { animation: hero-intro 0.9s cubic-bezier(.22,.68,0,1) forwards; }
   .lnd-hero-dots {
     position: absolute; inset: 0; pointer-events: none;
-    background-image: radial-gradient(circle at 20% 20%, rgba(77,126,232,0.07) 0.8px, transparent 1px), radial-gradient(circle at 80% 80%, rgba(77,126,232,0.07) 0.8px, transparent 1px);
+    background-image: radial-gradient(circle at 20% 20%, rgb(var(--lnd-accent-rgb) /0.07) 0.8px, transparent 1px), radial-gradient(circle at 80% 80%, rgb(var(--lnd-accent-rgb) /0.07) 0.8px, transparent 1px);
     background-size: 28px 28px;
   }
   .lnd-hero-glow {
     position: absolute; inset: 0; pointer-events: none;
-    background: radial-gradient(ellipse 55% 45% at 70% 25%, rgba(77,126,232,0.13) 0%, transparent 65%), radial-gradient(ellipse 40% 30% at 15% 85%, rgba(77,126,232,0.06) 0%, transparent 60%);
+    background: radial-gradient(ellipse 55% 45% at 70% 25%, rgb(var(--lnd-accent-rgb) /0.13) 0%, transparent 65%), radial-gradient(ellipse 40% 30% at 15% 85%, rgb(var(--lnd-accent-rgb) /0.06) 0%, transparent 60%);
     filter: blur(16px);
   }
   .lnd-hero-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
@@ -1499,7 +1586,7 @@ const CSS = `
   .lnd-hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lnd-accent); animation: cnc-pulse 3s ease-in-out infinite; }
   .lnd-hero-h1 { font: 700 50px/1.08 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 20px; letter-spacing: -0.025em; }
   .lnd-hero-h1-accent { color: var(--lnd-accent); }
-  .lnd-hero-sub { font-size: 16px; color: var(--lnd-t2); max-width: 460px; margin: 0 0 32px; line-height: 1.7; }
+  .lnd-hero-sub { font-family: var(--lnd-f-body); font-size: 17px; color: var(--lnd-t2); max-width: 460px; margin: 0 0 32px; line-height: 1.7; }
   .lnd-hero-cta { display: flex; align-items: center; gap: 4px; margin-bottom: 36px; }
   .lnd-hero-stats { display: inline-flex; align-items: stretch; border: 1px solid var(--lnd-border); border-radius: 2px; overflow: hidden; background: var(--lnd-surface); align-self: flex-start; }
   .lnd-stat { padding: 14px 22px; }
@@ -1531,7 +1618,7 @@ const CSS = `
   .lnd-draw-scanline {
     position: absolute; top: 18px; bottom: 96px; left: 0; width: 2px;
     background: linear-gradient(180deg, transparent, var(--lnd-accent) 25%, var(--lnd-accent) 75%, transparent);
-    box-shadow: 0 0 14px rgba(77,126,232,0.7);
+    box-shadow: 0 0 14px rgb(var(--lnd-accent-rgb) /0.7);
     opacity: 0; z-index: 1; pointer-events: none;
     animation: scan-move 3.2s cubic-bezier(.4,0,.6,1) 0.2s forwards;
   }
@@ -1594,26 +1681,26 @@ const CSS = `
   .lnd-section-head { text-align: center; margin-bottom: 52px; }
   .lnd-label { font: 600 11px/1 var(--lnd-f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--lnd-accent); margin-bottom: 14px; }
   .lnd-section-h2 { font: 700 36px/1.15 var(--lnd-f-display); color: var(--lnd-tx); margin: 0; letter-spacing: -0.01em; }
-  .lnd-section-lead { font-size: 16px; color: var(--lnd-t2); max-width: 620px; margin: 18px auto 0; line-height: 1.7; }
+  .lnd-section-lead { font-family: var(--lnd-f-body); font-size: 17px; color: var(--lnd-t2); max-width: 620px; margin: 18px auto 0; line-height: 1.7; }
 
   /* PROBLEMS */
   /* PROBLEM — Vorher/Nachher-Kontrast */
   .lnd-contrast { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
   .lnd-contrast-heads { display: grid; grid-template-columns: 1fr 52px 1fr; margin-bottom: 4px; }
   .lnd-contrast-head { font: 600 11px/1 var(--lnd-f-mono); letter-spacing: 0.1em; text-transform: uppercase; padding: 0 4px; }
-  .lnd-contrast-head--before { color: #C97070; }
+  .lnd-contrast-head--before { color: var(--lnd-danger); }
   .lnd-contrast-head--after { color: var(--lnd-accent-h); }
   .lnd-contrast-row { display: grid; grid-template-columns: 1fr 52px 1fr; align-items: stretch; }
   .lnd-c-before, .lnd-c-after { display: flex; gap: 11px; padding: 17px 20px; border: 1px solid; border-radius: 2px; font-size: 14px; line-height: 1.5; transition: transform 160ms, border-color 160ms; }
-  .lnd-c-before { background: rgba(201,112,112,0.045); border-color: rgba(201,112,112,0.16); color: var(--lnd-t2); }
+  .lnd-c-before { background: rgb(var(--lnd-danger-rgb) /0.045); border-color: rgb(var(--lnd-danger-rgb) /0.16); color: var(--lnd-t2); }
   .lnd-c-after { background: var(--lnd-accent-bg); border-color: var(--lnd-accent-b); color: var(--lnd-t1); }
   .lnd-contrast-row:hover .lnd-c-after { border-color: var(--lnd-accent); transform: translateX(2px); }
-  .lnd-c-x { color: #C97070; font-weight: 700; flex-shrink: 0; }
+  .lnd-c-x { color: var(--lnd-danger); font-weight: 700; flex-shrink: 0; }
   .lnd-c-check { color: var(--lnd-accent-h); font-weight: 700; flex-shrink: 0; }
   .lnd-c-metric { align-items: center; padding-top: 15px; padding-bottom: 15px; }
   .lnd-c-metric-body { display: flex; flex-direction: column; gap: 2px; }
   .lnd-c-metric-num { font: 700 22px/1.1 var(--lnd-f-mono); letter-spacing: -0.01em; }
-  .lnd-c-before .lnd-c-metric-num { color: #D38585; }
+  .lnd-c-before .lnd-c-metric-num { color: var(--lnd-danger); }
   .lnd-c-after .lnd-c-metric-num { color: var(--lnd-accent-h); }
   .lnd-c-metric-cap { font-size: 12px; color: var(--lnd-t3); }
   .lnd-c-arrow { display: flex; align-items: center; justify-content: center; color: var(--lnd-t4); }
@@ -1639,13 +1726,13 @@ const CSS = `
     width: 12px; height: 12px; border-radius: 50%;
     background: var(--lnd-bg-alt); border: 2px solid var(--lnd-accent);
     margin: 0 auto 24px; position: relative; top: -10px;
-    box-shadow: 0 0 10px rgba(77,126,232,0.45);
+    box-shadow: 0 0 10px rgb(var(--lnd-accent-rgb) /0.45);
   }
   .lnd-flow-meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
   .lnd-flow-num { font: 600 11px/1 var(--lnd-f-mono); color: var(--lnd-accent); letter-spacing: 0.1em; }
   .lnd-flow-time { font: 500 10px/1 var(--lnd-f-mono); color: var(--lnd-t3); text-transform: uppercase; letter-spacing: 0.06em; }
   .lnd-flow-title { font: 600 16px/1.3 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 14px; }
-  .lnd-flow-desc { font-size: 13px; color: var(--lnd-t2); line-height: 1.65; margin: 14px 0 0; }
+  .lnd-flow-desc { font-family: var(--lnd-f-body); font-size: 14px; color: var(--lnd-t2); line-height: 1.65; margin: 14px 0 0; }
 
   /* Mini-Artefakte */
   .lnd-art {
@@ -1713,7 +1800,7 @@ const CSS = `
   .lnd-viewer-modes {
     position: absolute; top: 16px; left: 50%; transform: translateX(-50%); z-index: 5;
     display: flex; gap: 2px; padding: 4px;
-    background: rgba(8,11,16,0.72); border: 1px solid var(--lnd-border);
+    background: rgb(var(--lnd-bg-rgb) /0.72); border: 1px solid var(--lnd-border);
     border-radius: 100px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   }
   .lnd-viewer-mode {
@@ -1722,12 +1809,12 @@ const CSS = `
     cursor: pointer; transition: color 120ms, background 120ms;
   }
   .lnd-viewer-mode:hover { color: var(--lnd-tx); }
-  .lnd-viewer-mode.is-active { background: var(--lnd-accent); color: #fff; }
+  .lnd-viewer-mode.is-active { background: var(--lnd-accent-h); color: #fff; }
   .lnd-viewer-stage {
     width: 100%; height: 460px; position: relative;
     background:
-      radial-gradient(ellipse 50% 60% at 50% 45%, rgba(77,126,232,0.10) 0%, transparent 70%),
-      radial-gradient(circle at 20% 20%, rgba(77,126,232,0.06) 0.8px, transparent 1px);
+      radial-gradient(ellipse 50% 60% at 50% 45%, rgb(var(--lnd-accent-rgb) /0.10) 0%, transparent 70%),
+      radial-gradient(circle at 20% 20%, rgb(var(--lnd-accent-rgb) /0.06) 0.8px, transparent 1px);
     background-size: auto, 26px 26px;
   }
   .lnd-viewer-stage canvas { display: block; position: relative; z-index: 1; }
@@ -1742,7 +1829,7 @@ const CSS = `
     position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 5;
     display: flex; align-items: center; gap: 7px;
     font: 500 11px/1 var(--lnd-f-mono); color: var(--lnd-t3);
-    background: rgba(8,11,16,0.6); border: 1px solid var(--lnd-border);
+    background: rgb(var(--lnd-bg-rgb) /0.6); border: 1px solid var(--lnd-border);
     border-radius: 100px; padding: 7px 12px;
   }
   .lnd-viewer-hint svg { color: var(--lnd-accent); }
@@ -1750,7 +1837,7 @@ const CSS = `
     position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center;
     padding: 56px 24px 24px;
     background:
-      radial-gradient(ellipse 60% 70% at 50% 48%, rgba(77,126,232,0.08) 0%, transparent 72%),
+      radial-gradient(ellipse 60% 70% at 50% 48%, rgb(var(--lnd-accent-rgb) /0.08) 0%, transparent 72%),
       var(--lnd-surface);
   }
   .lnd-p2d-svg { width: 100%; height: 100%; }
@@ -1763,7 +1850,7 @@ const CSS = `
   .lnd-split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
   .lnd-split--rev .lnd-split-text { order: 2; }
   .lnd-split-h2 { font: 700 34px/1.15 var(--lnd-f-display); color: var(--lnd-tx); margin: 14px 0 18px; letter-spacing: -0.02em; }
-  .lnd-split-lead { font-size: 15px; color: var(--lnd-t2); line-height: 1.75; margin: 0 0 24px; }
+  .lnd-split-lead { font-family: var(--lnd-f-body); font-size: 16px; color: var(--lnd-t2); line-height: 1.75; margin: 0 0 24px; }
 
   /* CALC */
   .lnd-calc-meta { display: flex; gap: 14px; margin-top: 6px; }
@@ -1790,11 +1877,11 @@ const CSS = `
   .lnd-feature:hover { background: var(--lnd-elevated); }
   .lnd-feature-icon { width: 40px; height: 40px; background: var(--lnd-accent-bg); border: 1px solid var(--lnd-accent-b); border-radius: 2px; display: flex; align-items: center; justify-content: center; color: var(--lnd-accent); margin-bottom: 18px; }
   .lnd-feature-title { font: 600 15px/1.3 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 8px; }
-  .lnd-feature-desc { font-size: 13px; color: var(--lnd-t2); line-height: 1.65; margin: 0; }
+  .lnd-feature-desc { font-family: var(--lnd-f-body); font-size: 14px; color: var(--lnd-t2); line-height: 1.65; margin: 0; }
 
   /* STATS BAND */
   .lnd-band { position: relative; overflow: hidden; background: var(--lnd-surface); border-top: 1px solid var(--lnd-border); border-bottom: 1px solid var(--lnd-border); padding: 64px 32px; }
-  .lnd-band-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(77,126,232,0.10) 0%, transparent 70%); }
+  .lnd-band-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgb(var(--lnd-accent-rgb) /0.10) 0%, transparent 70%); }
   .lnd-band-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
   .lnd-band-item { text-align: center; }
   .lnd-band-val { font: 700 40px/1 var(--lnd-f-mono); color: var(--lnd-tx); letter-spacing: -0.02em; margin-bottom: 10px; }
@@ -1804,8 +1891,8 @@ const CSS = `
   .lnd-pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
   .lnd-plan { background: var(--lnd-surface); border: 1px solid var(--lnd-border); border-radius: 2px; padding: 28px 24px; position: relative; }
   .lnd-plan--featured { border-color: var(--lnd-accent); background: var(--lnd-elevated); }
-  .lnd-plan-badge { position: absolute; top: -1px; left: 50%; transform: translateX(-50%); background: var(--lnd-accent); color: #fff; font: 600 10px/1 var(--lnd-f-mono); letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: 0 0 3px 3px; white-space: nowrap; }
-  .lnd-plan-badge--free { background: #7A9C68; }
+  .lnd-plan-badge { position: absolute; top: -1px; left: 50%; transform: translateX(-50%); background: var(--lnd-accent-h); color: #fff; font: 600 10px/1 var(--lnd-f-mono); letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: 0 0 3px 3px; white-space: nowrap; }
+  .lnd-plan-badge--free { background: var(--lnd-success); }
   .lnd-plan-head { margin-bottom: 20px; }
   .lnd-plan-name { font: 600 12px/1 var(--lnd-f-ui); text-transform: uppercase; letter-spacing: 0.08em; color: var(--lnd-t2); margin-bottom: 14px; }
   .lnd-plan-billing { font-weight: 400; color: var(--lnd-t3); }
@@ -1855,15 +1942,15 @@ const CSS = `
   .lnd-cta-grid {
     position: absolute; inset: 0; pointer-events: none;
     background:
-      radial-gradient(ellipse 50% 80% at 50% 0%, rgba(77,126,232,0.16) 0%, transparent 60%),
-      repeating-linear-gradient(0deg, transparent 0 31px, rgba(77,126,232,0.05) 31px 32px),
-      repeating-linear-gradient(90deg, transparent 0 31px, rgba(77,126,232,0.05) 31px 32px);
+      radial-gradient(ellipse 50% 80% at 50% 0%, rgb(var(--lnd-accent-rgb) /0.16) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent 0 31px, rgb(var(--lnd-accent-rgb) /0.05) 31px 32px),
+      repeating-linear-gradient(90deg, transparent 0 31px, rgb(var(--lnd-accent-rgb) /0.05) 31px 32px);
     mask-image: radial-gradient(ellipse 70% 100% at 50% 0%, #000 0%, transparent 75%);
     -webkit-mask-image: radial-gradient(ellipse 70% 100% at 50% 0%, #000 0%, transparent 75%);
   }
   .lnd-cta-content { position: relative; z-index: 1; text-align: center; max-width: 600px; margin: 0 auto; }
   .lnd-cta-h2 { font: 700 42px/1.12 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 14px; letter-spacing: -0.02em; }
-  .lnd-cta-sub { font-size: 15px; color: var(--lnd-t2); margin: 0 0 32px; }
+  .lnd-cta-sub { font-family: var(--lnd-f-body); font-size: 16px; color: var(--lnd-t2); margin: 0 0 32px; }
   .lnd-cta-actions { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
   .lnd-cta-contact { margin-top: 28px; font: 500 13px/1.5 var(--lnd-f-mono); color: var(--lnd-t3); }
   .lnd-cta-contact a { color: var(--lnd-accent); text-decoration: none; }
@@ -1932,7 +2019,7 @@ const CSS = `
       position: fixed; top: 60px; left: 0; right: 0;
       max-height: calc(100vh - 60px); overflow-y: auto;
       padding: 12px 20px 24px;
-      background: rgba(8,11,16,0.97);
+      background: rgb(var(--lnd-bg-rgb) /0.97);
       backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--lnd-rule);
       transform: translateY(-10px); opacity: 0; pointer-events: none;
@@ -1951,7 +2038,7 @@ const CSS = `
     .lnd-sticky-cta {
       display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
       padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-      background: rgba(8,11,16,0.95);
+      background: rgb(var(--lnd-bg-rgb) /0.95);
       backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
       border-top: 1px solid var(--lnd-rule);
       transform: translateY(130%);
@@ -2012,13 +2099,13 @@ const CSS = `
   .lnd-faq-q:hover { color: var(--lnd-tx); }
   .lnd-faq-chevron { flex-shrink: 0; color: var(--lnd-t3); transition: transform 0.2s; }
   .lnd-faq-item[open] .lnd-faq-chevron { transform: rotate(180deg); }
-  .lnd-faq-a { padding: 0 20px 18px; font: 400 14px/1.7 var(--lnd-f-ui); color: var(--lnd-t2); margin: 0; }
+  .lnd-faq-a { padding: 0 20px 18px; font: 400 15px/1.7 var(--lnd-f-body); color: var(--lnd-t2); margin: 0; }
 
   /* ── KONTAKT-SEKTION ── */
   .lnd-contact-wrap { padding: 80px 32px; border-top: 1px solid var(--lnd-rule); }
   .lnd-contact-inner { max-width: 600px; margin: 0 auto; }
   .lnd-contact-h2 { font: 700 36px/1.15 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 10px; letter-spacing: -0.02em; text-align: center; }
-  .lnd-contact-sub { font-size: 14px; color: var(--lnd-t2); text-align: center; margin: 0 0 36px; }
+  .lnd-contact-sub { font-family: var(--lnd-f-body); font-size: 15px; color: var(--lnd-t2); text-align: center; margin: 0 0 36px; }
   .lnd-contact-form { display: flex; flex-direction: column; gap: 16px; }
   .lnd-contact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 520px) { .lnd-contact-row { grid-template-columns: 1fr; } }
@@ -2029,8 +2116,8 @@ const CSS = `
   .lnd-contact-form input,
   .lnd-contact-form select,
   .lnd-contact-form textarea {
-    background: #15171C; border: 1px solid #2C303A; border-radius: 8px;
-    color: #D8DCE4; font: 400 14px/1.5 var(--lnd-f-ui); padding: 10px 12px;
+    background: var(--lnd-surface); border: 1px solid var(--lnd-border); border-radius: 8px;
+    color: var(--lnd-t1); font: 400 14px/1.5 var(--lnd-f-ui); padding: 10px 12px;
     outline: none; resize: vertical; transition: border-color 0.15s;
     appearance: none; -webkit-appearance: none;
   }
@@ -2040,17 +2127,17 @@ const CSS = `
   }
   .lnd-contact-form input:focus,
   .lnd-contact-form select:focus,
-  .lnd-contact-form textarea:focus { border-color: #6B8FBE; }
-  .lnd-contact-form input::placeholder, .lnd-contact-form textarea::placeholder { color: #44495A; }
-  .lnd-contact-error { font: 400 13px/1.5 var(--lnd-f-ui); color: #B85555; }
-  .lnd-contact-error a { color: #B85555; }
+  .lnd-contact-form textarea:focus { border-color: var(--lnd-accent); }
+  .lnd-contact-form input::placeholder, .lnd-contact-form textarea::placeholder { color: var(--lnd-t3); }
+  .lnd-contact-error { font: 400 13px/1.5 var(--lnd-f-ui); color: var(--lnd-danger); }
+  .lnd-contact-error a { color: var(--lnd-danger); }
   .lnd-contact-submit { align-self: flex-start; }
   .lnd-contact-submit:disabled { opacity: 0.6; cursor: not-allowed; }
   .lnd-contact-success {
     display: flex; flex-direction: column; align-items: center; gap: 12px;
-    text-align: center; padding: 32px 0; color: #7A9C68;
+    text-align: center; padding: 32px 0; color: var(--lnd-success);
   }
-  .lnd-contact-success h3 { font: 600 20px/1.2 var(--lnd-f-ui); color: #ECEEF2; margin: 0; }
-  .lnd-contact-success p { font: 400 14px/1.5 var(--lnd-f-ui); color: #8E96A4; margin: 0 0 8px; }
+  .lnd-contact-success h3 { font: 600 20px/1.2 var(--lnd-f-ui); color: var(--lnd-t1); margin: 0; }
+  .lnd-contact-success p { font: 400 14px/1.5 var(--lnd-f-ui); color: var(--lnd-t2); margin: 0 0 8px; }
   .lnd-contact-success .lnd-btn-primary { margin-top: 8px; }
 `;
