@@ -635,6 +635,7 @@ export default function LandingPage() {
     go(`/einstellungen/tarif?plan=${plan}&mode=${mode}`);
 
   const heroRef = useRef<HTMLElement>(null);
+  const ctaActionsRef = useRef<HTMLDivElement>(null);
   const [heroIn, setHeroIn] = useState(false);
   const [cycle, setCycle] = useState(0);
   const [reduced, setReduced] = useState(false);
@@ -664,6 +665,60 @@ export default function LandingPage() {
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setHeroIn(true); obs.disconnect(); } }, { threshold: 0.1 });
     obs.observe(node);
     return () => obs.disconnect();
+  }, []);
+
+  // CTA-Proximity-Glow: je näher der Cursor dem Button kommt, desto stärker leuchtet er.
+  // Distanz Cursor → Button-Mitte wird auf die CSS-Variable --cta-glow (0…1) gemappt.
+  useEffect(() => {
+    const el = ctaActionsRef.current;
+    if (!el) return;
+    const panel = el.closest(".lnd-cta-panel") ?? el; // Bezugsrechteck für die Reichweite
+    let raf = 0;
+    let pending: { x: number; y: number } | null = null;
+    const apply = () => {
+      raf = 0;
+      if (!pending) return;
+      const pr = panel.getBoundingClientRect();
+      // Außerhalb des Panels: kein Glow → er startet exakt am Rand des Rechtecks.
+      if (pending.x < pr.left || pending.x > pr.right || pending.y < pr.top || pending.y > pr.bottom) {
+        el.style.setProperty("--cta-glow", "0");
+        return;
+      }
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dist = Math.hypot(pending.x - cx, pending.y - cy);
+      // Reichweite = Distanz Button-Mitte → entfernteste Panel-Ecke (am Rand ⇒ t≈0, am Button ⇒ t=1)
+      const reach = Math.max(
+        Math.hypot(pr.left - cx, pr.top - cy),
+        Math.hypot(pr.right - cx, pr.top - cy),
+        Math.hypot(pr.left - cx, pr.bottom - cy),
+        Math.hypot(pr.right - cx, pr.bottom - cy),
+      );
+      const t = reach > 0 ? Math.max(0, 1 - dist / reach) : 0;
+      // Floor = sichtbare Grund-Aufhellung, sobald der Cursor im Panel ist; quadratisch nach oben bis zum Button.
+      const FLOOR = 0.22;
+      const glow = FLOOR + (1 - FLOOR) * t * t;
+      el.style.setProperty("--cta-glow", glow.toFixed(3));
+    };
+    const onMove = (e: PointerEvent) => {
+      pending = { x: e.clientX, y: e.clientY };
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        window.addEventListener("pointermove", onMove, { passive: true });
+      } else {
+        window.removeEventListener("pointermove", onMove);
+        el.style.setProperty("--cta-glow", "0");
+      }
+    }, { threshold: 0 });
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      window.removeEventListener("pointermove", onMove);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   // Scan-Loop: alle 7,5 s neu starten
@@ -1200,7 +1255,7 @@ export default function LandingPage() {
             <div className="lnd-cta-content">
               <h2 className="lnd-cta-h2">In Sekunden zum ersten<br />kalkulierten Teil.</h2>
               <p className="lnd-cta-sub">1. Monat gratis — keine Kreditkarte, keine Einrichtung.</p>
-              <div className="lnd-cta-actions">
+              <div className="lnd-cta-actions" ref={ctaActionsRef}>
                 <button className="lnd-btn-primary" onClick={() => go()}>
                   Kostenlos testen
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
@@ -1951,7 +2006,21 @@ const CSS = `
   .lnd-cta-content { position: relative; z-index: 1; text-align: center; max-width: 600px; margin: 0 auto; }
   .lnd-cta-h2 { font: 700 42px/1.12 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 14px; letter-spacing: -0.02em; }
   .lnd-cta-sub { font-family: var(--lnd-f-body); font-size: 16px; color: var(--lnd-t2); margin: 0 0 32px; }
-  .lnd-cta-actions { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .lnd-cta-actions { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .lnd-cta-actions::before {
+    content: ''; position: absolute; left: 50%; top: 50%; z-index: -1;
+    width: 360px; height: 360px;
+    transform: translate(-50%, -50%) scale(calc(0.5 + 0.5 * var(--cta-glow, 0)));
+    background: radial-gradient(circle, rgb(var(--lnd-accent-rgb) /0.6) 0%, rgb(var(--lnd-accent-rgb) /0.2) 38%, transparent 70%);
+    filter: blur(28px); pointer-events: none;
+    opacity: var(--cta-glow, 0);
+    transition: opacity 140ms ease, transform 140ms ease;
+  }
+  /* Fallback (kein JS / Touch): voller Glow bei direktem Hover */
+  .lnd-cta-actions:has(.lnd-btn-primary:hover)::before { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  @media (prefers-reduced-motion: reduce) {
+    .lnd-cta-actions::before { transform: translate(-50%, -50%) scale(1); transition: opacity 140ms ease; }
+  }
   .lnd-cta-contact { margin-top: 28px; font: 500 13px/1.5 var(--lnd-f-mono); color: var(--lnd-t3); }
   .lnd-cta-contact a { color: var(--lnd-accent); text-decoration: none; }
   .lnd-cta-contact a:hover { color: var(--lnd-accent-h); }
