@@ -826,17 +826,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ───────── TRUST-STRIP ───────── */}
-        <section className="lnd-trust">
-          <div className="lnd-trust-inner">
-            <span className="lnd-trust-lab">Gebaut für die Drehteil-Lohnfertigung im DACH-Raum</span>
-            <div className="lnd-trust-tags">
-              {["Wellen & Bolzen", "Büchsen & Flansche", "Hydraulik-Teile", "Sondermaschinenbau", "Medizintechnik"].map((t) => (
-                <span key={t} className="lnd-trust-tag">{t}</span>
-              ))}
-            </div>
-          </div>
-        </section>
+
 
         {/* ───────── PROBLEM ───────── */}
         <section className="lnd-section">
@@ -845,8 +835,7 @@ export default function LandingPage() {
               <div className="lnd-label">Das Problem</div>
               <h2 className="lnd-section-h2">Kalkulation frisst Zeit, die Ihnen woanders fehlt.</h2>
               <p className="lnd-section-lead">
-                Jedes Drehteil von Hand zu kalkulieren bindet Ihre besten Leute — Teil für Teil.
-                Vinyos macht daraus eine Sache von Sekunden.
+                Von Hand zu kalkulieren bindet Ihre besten Leute. Teil für Teil.
               </p>
             </Reveal>
             <div className="lnd-contrast">
@@ -859,8 +848,7 @@ export default function LandingPage() {
                 <div className="lnd-c-before lnd-c-metric">
                   <span className="lnd-c-x" aria-hidden>✕</span>
                   <span className="lnd-c-metric-body">
-                    <span className="lnd-c-metric-num">über 15 Min</span>
-                    <span className="lnd-c-metric-cap">pro Teil, von Hand</span>
+                    <span className="lnd-c-metric-num">Über 15 Minuten</span>
                   </span>
                 </div>
                 <div className="lnd-c-arrow" aria-hidden>
@@ -869,8 +857,7 @@ export default function LandingPage() {
                 <div className="lnd-c-after lnd-c-metric">
                   <span className="lnd-c-check" aria-hidden>✓</span>
                   <span className="lnd-c-metric-body">
-                    <span className="lnd-c-metric-num">unter 60 Sek</span>
-                    <span className="lnd-c-metric-cap">vollautomatisch</span>
+                    <span className="lnd-c-metric-num">Unter 60 Sekunden</span>
                   </span>
                 </div>
               </Reveal>
@@ -1370,16 +1357,16 @@ function PlanItem({ on, children }: { on?: boolean; children: React.ReactNode })
 ──────────────────────────────────────────────── */
 const PAINS = [
   {
-    pain: "Marge nach Bauchgefühl — mal zu teuer, mal umsonst gearbeitet.",
-    gain: "Preise auf echten Schnittdaten & Ihren Maschinensätzen.",
+    pain: "Kalkulationsaufwand verlorener Aufträge belasten die Marge.",
+    gain: "Verlorene Aufträge belasten nicht zusätzlich.",
   },
   {
-    pain: "Niemand rechnet gegen — Fehler fallen erst spät auf.",
-    gain: "KI-Kalkulation als unabhängige zweite Meinung.",
+    pain: "Individuelle Erfahrung und Bauchgefühl. Ein Teil, viele Preise.",
+    gain: "Regelbasiert und konsistent für jeden Auftrag.",
   },
   {
-    pain: "Anfragen stapeln sich, der Kunde springt ab.",
-    gain: "Antwort am selben Tag — Sie sind im Rennen.",
+    pain: "Anfragen stapeln sich, Fristen verstreichen.",
+    gain: "Angebot am selben Tag führt zu mehr Anfragen und Aufträgen.",
   },
 ];
 
