@@ -800,10 +800,6 @@ export default function LandingPage() {
           <div className="lnd-hero-inner">
             <div className="lnd-hero-grid">
               <div className="lnd-hero-left">
-                <div className="lnd-hero-badge">
-                  <span className="lnd-hero-badge-dot" />
-                  KI-Kalkulation für CNC-Drehteile
-                </div>
                 <h1 className="lnd-hero-h1">
                   CNC-Drehteile kalkulieren —<br />
                   <span className="lnd-hero-h1-accent">in unter 60 Sekunden.</span>
@@ -818,31 +814,11 @@ export default function LandingPage() {
                   </button>
                   <a href="#praezision" className="lnd-btn-ghost">Was wir erkennen</a>
                 </div>
-                <div className="lnd-hero-stats">
-                  <div className="lnd-stat">
-                    <div className="lnd-stat-val">&lt;60<span className="lnd-stat-unit">s</span></div>
-                    <div className="lnd-stat-lab">Analyse pro Teil</div>
-                  </div>
-                  <div className="lnd-stat-div" />
-                  <div className="lnd-stat">
-                    <div className="lnd-stat-val">14</div>
-                    <div className="lnd-stat-lab">GD&amp;T-Symbole</div>
-                  </div>
-                  <div className="lnd-stat-div" />
-                  <div className="lnd-stat">
-                    <div className="lnd-stat-val">84</div>
-                    <div className="lnd-stat-lab">Werkstoffe</div>
-                  </div>
-                </div>
               </div>
 
               {/* Zeichnungs-Scan-Card */}
               <div className="lnd-hero-right">
                 <div className="lnd-draw-card">
-                  <div className="lnd-draw-head">
-                    <span className="lnd-draw-head-file">welle_40h7.pdf + .step</span>
-                    <span className="lnd-draw-head-tag">Live-Analyse</span>
-                  </div>
                   <DrawingScan key={cycle} reduced={reduced} />
                 </div>
               </div>
@@ -1653,9 +1629,9 @@ const CSS = `
   /* DRAWING SCAN CARD */
   .lnd-hero-right { display: flex; justify-content: flex-end; }
   .lnd-draw-card {
-    width: 100%; max-width: 440px; background: var(--lnd-surface);
+    width: 100%; max-width: 480px; background: var(--lnd-surface);
     border: 1px solid var(--lnd-border); border-radius: 3px;
-    position: relative; overflow: hidden;
+    position: relative; overflow: hidden; padding: 24px 16px;
     animation: hero-card 0.8s cubic-bezier(.22,.68,0,1) 0.25s both;
   }
   .lnd-draw-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--lnd-accent), transparent); opacity: 0.6; z-index: 2; }
