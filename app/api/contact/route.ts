@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { error } = await resend.emails.send({
-    from: "Vinyos Kontaktformular <onboarding@resend.dev>",
+    from: "Vinyos Kontaktformular <kontakt@vinyos.de>",
     to: "kontakt@vinyos.de",
     replyTo: email,
     subject: `[${subject}] ${name}`,

@@ -647,6 +647,27 @@ export default function LandingPage() {
   const [contactMsg, setContactMsg] = useState("");
   const [contactState, setContactState] = useState<"idle" | "sending" | "done" | "error">("idle");
 
+  const CALENDLY_URL = "https://calendly.com/kontakt-vinyos/30min?background_color=faf9f5&text_color=141413&primary_color=3f7d7b";
+
+  const openCalendly = () => {
+    (window as any).Calendly?.initPopupWidget({ url: CALENDLY_URL });
+  };
+
+  useEffect(() => {
+    if (!document.querySelector('link[href*="calendly.com/assets"]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://assets.calendly.com/assets/external/widget.css";
+      document.head.appendChild(link);
+    }
+    if (!document.querySelector('script[src*="calendly.com/assets"]')) {
+      const script = document.createElement("script");
+      script.src = "https://assets.calendly.com/assets/external/widget.js";
+      script.async = true;
+      document.head.appendChild(script);
+    }
+  }, []);
+
   const sendContact = async (e: React.FormEvent) => {
     e.preventDefault();
     setContactState("sending");
@@ -768,6 +789,7 @@ export default function LandingPage() {
               <a href="#kontakt" className="lnd-nav-link">Kontakt</a>
             </div>
             <ThemeToggle />
+            <button className="lnd-btn-demo-nav" onClick={openCalendly}>Demo buchen</button>
             <button className="lnd-btn-nav" onClick={() => go()}>Kostenlos testen</button>
             <button
               className="lnd-nav-burger"
@@ -790,6 +812,7 @@ export default function LandingPage() {
             <a href="#preise" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Preise</a>
             <a href="#kontakt" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Kontakt</a>
             <button className="lnd-btn-primary lnd-nav-drawer-cta" onClick={() => { setNavOpen(false); go(); }}>Kostenlos testen</button>
+            <button className="lnd-btn-outline lnd-nav-drawer-cta" onClick={() => { setNavOpen(false); openCalendly(); }}>Demo buchen</button>
           </div>
         </nav>
 
@@ -816,7 +839,7 @@ export default function LandingPage() {
                     Kostenlos testen
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
                   </button>
-                  <a href="#praezision" className="lnd-btn-ghost">Was wir erkennen</a>
+                  <button className="lnd-btn-ghost" onClick={openCalendly}>Demo buchen</button>
                 </div>
                 <div className="lnd-hero-stats">
                   <div className="lnd-stat">
@@ -1260,6 +1283,7 @@ export default function LandingPage() {
                   Kostenlos testen
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
                 </button>
+                <button className="lnd-btn-ghost" onClick={openCalendly}>Demo buchen</button>
               </div>
               <div className="lnd-cta-contact">
                 Abrechnung einfach per hinterlegter Kreditkarte oder auf Rechnung.
@@ -1273,7 +1297,17 @@ export default function LandingPage() {
           <Reveal className="lnd-contact-inner">
             <p className="eyebrow" style={{textAlign:"center",marginBottom:"12px"}}>Kontakt</p>
             <h2 className="lnd-contact-h2">Noch Fragen?</h2>
-            <p className="lnd-contact-sub">Wir antworten meist innerhalb eines Werktages.</p>
+            <p className="lnd-contact-sub">Buchen Sie eine Live-Demo oder schreiben Sie uns — wir antworten meist innerhalb eines Werktages.</p>
+            <div className="lnd-contact-demo">
+              <button className="lnd-btn-primary lnd-contact-demo-btn" onClick={openCalendly}>
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="3" width="11" height="10" rx="1.5" /><path d="M5 2v2M10 2v2M2 6h11" /></svg>
+                Demo buchen — 30 Min.
+              </button>
+              <span className="lnd-contact-demo-hint">Kostenlos · Kein Skript · Ihr echter Anwendungsfall</span>
+            </div>
+            <div className="lnd-contact-divider">
+              <span>oder schreiben Sie uns</span>
+            </div>
             {contactState === "done" ? (
               <div className="lnd-contact-success">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="20" cy="20" r="18" /><path d="M12 20l6 6 10-12" /></svg>
@@ -1388,6 +1422,7 @@ function PlanItem({ on, children }: { on?: boolean; children: React.ReactNode })
     </li>
   );
 }
+
 
 /* ────────────────────────────────────────────────
    Daten
@@ -1963,7 +1998,7 @@ const CSS = `
   .lnd-plan-usage-val { font: 700 18px/1 var(--lnd-f-mono); color: var(--lnd-tx); letter-spacing: -0.02em; }
   .lnd-plan-usage--accent .lnd-plan-usage-val { color: var(--lnd-accent); }
   .lnd-plan-usage-lab { font: 500 11px/1.3 var(--lnd-f-mono); color: var(--lnd-t2); }
-  .lnd-plan-sub { font-size: 12px; color: var(--lnd-t3); margin: 0; line-height: 1.5; }
+  .lnd-plan-sub { font-size: 12px; color: var(--lnd-t3); margin: 0; line-height: 1.5; min-height: 36px; }
   .lnd-plan-cta { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
   .lnd-plan-btn { width: 100%; height: 40px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--lnd-border-s); color: var(--lnd-t1); border-radius: 2px; font: 500 13px/1 var(--lnd-f-ui); cursor: pointer; transition: background 120ms, border-color 120ms, color 120ms, transform 120ms; }
   .lnd-plan-btn:hover { border-color: var(--lnd-accent); color: var(--lnd-tx); transform: translateY(-1px); }
@@ -2209,4 +2244,24 @@ const CSS = `
   .lnd-contact-success h3 { font: 600 20px/1.2 var(--lnd-f-ui); color: var(--lnd-t1); margin: 0; }
   .lnd-contact-success p { font: 400 14px/1.5 var(--lnd-f-ui); color: var(--lnd-t2); margin: 0 0 8px; }
   .lnd-contact-success .lnd-btn-primary { margin-top: 8px; }
+
+  /* ── DEMO-NAV-BUTTON ── */
+  .lnd-btn-demo-nav {
+    display: inline-flex; align-items: center; height: 36px; padding: 0 16px;
+    background: transparent; border: 1px solid var(--lnd-border-s); color: var(--lnd-t1);
+    border-radius: 2px; font: 500 13px/1 var(--lnd-f-ui); cursor: pointer; flex-shrink: 0;
+    transition: border-color 120ms, color 120ms, background 120ms;
+  }
+  .lnd-btn-demo-nav:hover { border-color: var(--lnd-accent); color: var(--lnd-accent); background: var(--lnd-accent-bg); }
+
+  /* ── KONTAKT-DEMO-BLOCK ── */
+  .lnd-contact-demo { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 28px; }
+  .lnd-contact-demo-btn { gap: 9px; height: 48px; padding: 0 28px; font-size: 15px; }
+  .lnd-contact-demo-hint { font: 400 13px/1 var(--lnd-f-mono); color: var(--lnd-t3); letter-spacing: 0.01em; }
+  .lnd-contact-divider {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+  }
+  .lnd-contact-divider::before,
+  .lnd-contact-divider::after { content: ""; flex: 1; height: 1px; background: var(--lnd-border); }
+  .lnd-contact-divider span { font: 400 12px/1 var(--lnd-f-ui); color: var(--lnd-t3); white-space: nowrap; }
 `;
