@@ -1280,7 +1280,7 @@ export default function LandingPage() {
           <div className="lnd-cta-band-inner">
             <div>
               <h2 className="lnd-cta-band-h2">In Sekunden zum ersten kalkulierten Teil.</h2>
-              <p className="lnd-cta-band-sub">1. Monat gratis — keine Kreditkarte, keine Einrichtung.</p>
+              <p className="lnd-cta-band-sub">Buchen Sie eine Live-Demo oder testen Sie einen Monat kostenlos.</p>
             </div>
             <div className="lnd-cta-actions" ref={ctaActionsRef}>
               <button className="lnd-btn-white-outline" onClick={openCalendly}>
