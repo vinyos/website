@@ -1289,7 +1289,7 @@ export default function LandingPage() {
               </button>
               <button className="lnd-btn-white-outline" onClick={openCalendly}>
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="3" width="11" height="10" rx="1.5" /><path d="M5 2v2M10 2v2M2 6h11" /></svg>
-                Demo buchen — 30 Min.
+                Demo buchen
               </button>
             </div>
           </div>
@@ -2050,7 +2050,7 @@ const CSS = `
   .lnd-cta-content { text-align: left; display: flex; flex-direction: column; justify-content: center; }
   .lnd-cta-h2 { font: 700 42px/1.12 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 14px; letter-spacing: -0.02em; }
   .lnd-cta-sub { font-family: var(--lnd-f-body); font-size: 16px; color: var(--lnd-t2); margin: 0 0 32px; }
-  .lnd-cta-actions { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .lnd-cta-actions { position: relative; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: nowrap; }
   .lnd-cta-actions::before {
     content: ''; position: absolute; left: 50%; top: 50%; z-index: -1;
     width: 360px; height: 360px;
