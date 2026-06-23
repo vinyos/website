@@ -222,7 +222,7 @@ const GDT_SYMBOLS = [
 /* ────────────────────────────────────────────────
    Interaktiver 3D-Teil-Viewer (Three.js, lazy)
 ──────────────────────────────────────────────── */
-type ViewMode = "solid" | "profil" | "explosion";
+type ViewMode = "solid" | "profil" | "explosion" | "zeichnung";
 
 /* Gemeinsame Teil-Geometrie für 3D-Volumen + 2D-Schnitt/Explosion (Stufenwelle) */
 const DEMO_SEGS: { len: number; dia: number; tol?: string }[] = [
@@ -369,6 +369,125 @@ function Profile2D({ mode }: { mode: "profil" | "explosion" }) {
       <text x={VW / 2} y={VH - 8} textAnchor="middle"
         fontFamily="IBM Plex Mono, monospace" fontSize={9} style={{ fill: "var(--lnd-t3)" }} letterSpacing={2}>
         {explosion ? "EXPLOSIONSANSICHT" : "SCHNITTANSICHT · A–A"}
+      </text>
+    </svg>
+  );
+}
+
+/* ────────────────────────────────────────────────
+   Technische Zeichnung — im Website-Stil (CSS-Variablen, kein hartes Weiß/Schwarz)
+──────────────────────────────────────────────── */
+function TechnicalDrawing() {
+  const VW = 720, VH = 400, CY = 168;
+  const total = DEMO_SEGS.reduce((a, s) => a + s.len, 0);
+  const maxDia = Math.max(...DEMO_SEGS.map(s => s.dia));
+  const PAD_X = 110;
+  const sc = Math.min((CY - 48) / (maxDia / 2), (VW - 2 * PAD_X) / total);
+  const r = (d: number) => (d / 2) * sc;
+
+  let cx = (VW - total * sc) / 2;
+  const boxes = DEMO_SEGS.map((s) => {
+    const w = s.len * sc;
+    const b = { ...s, x0: cx, x1: cx + w, w, rr: r(s.dia) };
+    cx += w;
+    return b;
+  });
+  const firstX = boxes[0].x0;
+  const lastX = boxes[boxes.length - 1].x1;
+
+  let pp = `M ${firstX} ${CY - boxes[0].rr}`;
+  boxes.forEach(b => { pp += ` L ${b.x0} ${CY - b.rr} L ${b.x1} ${CY - b.rr}`; });
+  for (let i = boxes.length - 1; i >= 0; i--) { const b = boxes[i]; pp += ` L ${b.x1} ${CY + b.rr} L ${b.x0} ${CY + b.rr}`; }
+  pp += " Z";
+
+  const FONT = "IBM Plex Mono, monospace";
+
+  const Arrow = (x: number, y: number, dir: 1 | -1) => (
+    <path d={`M ${x} ${y} l ${dir * 5} -2.4 l 0 4.8 Z`} style={{ fill: "var(--lnd-accent)" }} />
+  );
+
+  const HorizDim = (x0: number, x1: number, y: number, label: string, tol?: string, total?: boolean) => (
+    <g>
+      <line x1={x0} y1={y - 4} x2={x0} y2={y + 4} stroke="var(--lnd-accent)" strokeWidth={0.6} />
+      <line x1={x1} y1={y - 4} x2={x1} y2={y + 4} stroke="var(--lnd-accent)" strokeWidth={0.6} />
+      <line x1={x0} y1={y} x2={x1} y2={y} stroke="var(--lnd-accent)" strokeWidth={0.6} />
+      {Arrow(x0, y, 1)}{Arrow(x1, y, -1)}
+      <text x={(x0 + x1) / 2} y={y - 6} textAnchor="middle" fontSize={total ? 10 : 9} fontFamily={FONT}
+        style={{ fill: total ? "var(--lnd-t1)" : "var(--lnd-t2)" }} fontWeight={total ? "600" : "400"}>
+        {label}
+        {tol && <tspan dx={3} fontSize={8} style={{ fill: "var(--lnd-accent-h)" }}>{tol}</tspan>}
+      </text>
+    </g>
+  );
+
+  const DiaCallout = (b: typeof boxes[number], dx: number, dy: number, anchor: "start" | "end") => {
+    const sx = b.x0 + b.w / 2, sy = CY - b.rr;
+    const ex = sx + dx, ey = sy + dy;
+    const tx = ex + (anchor === "start" ? 5 : -5);
+    return (
+      <g fontFamily={FONT}>
+        <line x1={sx} y1={sy} x2={ex} y2={ey} stroke="var(--lnd-accent)" strokeWidth={0.7} />
+        <circle cx={sx} cy={sy} r={1.8} style={{ fill: "var(--lnd-accent)" }} />
+        <text x={tx} y={ey + 3.5} textAnchor={anchor} fontSize={11} style={{ fill: "var(--lnd-t1)" }}>
+          ⌀{b.dia}
+          {b.tol && <tspan dx={4} fontSize={9.5} style={{ fill: "var(--lnd-accent-h)" }}>{b.tol}</tspan>}
+        </text>
+      </g>
+    );
+  };
+
+  const dimY = CY + maxDia / 2 * sc + 28;
+
+  return (
+    <svg viewBox={`0 0 ${VW} ${VH}`} className="lnd-td-svg" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <pattern id="td-hatch" patternUnits="userSpaceOnUse" width={6} height={6}>
+          <line x1={0} y1={6} x2={6} y2={0} style={{ stroke: "var(--lnd-border-s)" }} strokeWidth={0.7} />
+        </pattern>
+        <clipPath id="td-clip"><path d={pp} /></clipPath>
+        <linearGradient id="td-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" style={{ stopColor: "var(--lnd-surface)" }} />
+          <stop offset="60%" style={{ stopColor: "var(--lnd-bg-alt)" }} />
+        </linearGradient>
+      </defs>
+
+      {/* Füllung & Schraffur */}
+      <path d={pp} fill="url(#td-fill)" />
+      <rect x={0} y={0} width={VW} height={VH} fill="url(#td-hatch)" clipPath="url(#td-clip)" />
+
+      {/* Mittelachse */}
+      <line x1={firstX - 28} y1={CY} x2={lastX + 28} y2={CY}
+        style={{ stroke: "var(--lnd-t4)" }} strokeWidth={0.7} strokeDasharray="9 3 2 3" />
+
+      {/* Kontur */}
+      <path d={pp} fill="none" style={{ stroke: "var(--lnd-accent)" }} strokeWidth={1.4} strokeLinejoin="miter" />
+
+      {/* Stirnflächen */}
+      <line x1={firstX} y1={CY - boxes[0].rr} x2={firstX} y2={CY + boxes[0].rr} style={{ stroke: "var(--lnd-accent)" }} strokeWidth={1.4} />
+      <line x1={lastX} y1={CY - boxes[boxes.length-1].rr} x2={lastX} y2={CY + boxes[boxes.length-1].rr} style={{ stroke: "var(--lnd-accent)" }} strokeWidth={1.4} />
+
+      {/* Ellipsen an den Enden */}
+      <ellipse cx={firstX} cy={CY} rx={3} ry={boxes[0].rr} style={{ fill: "var(--lnd-t4)", stroke: "var(--lnd-accent)" }} strokeWidth={0.8} />
+      <ellipse cx={lastX} cy={CY} rx={2.4} ry={boxes[boxes.length-1].rr} style={{ fill: "var(--lnd-t4)", stroke: "var(--lnd-accent)" }} strokeWidth={0.8} />
+
+      {/* ⌀-Callouts */}
+      <g style={{ opacity: 0, animation: "lnd-fade 0.5s 0.4s ease-out forwards" }}>
+        {DiaCallout(boxes[0], -28, -36, "end")}
+        {DiaCallout(boxes[2], -32, -50, "end")}
+        {DiaCallout(boxes[3], 30, -44, "start")}
+        {DiaCallout(boxes[5], 32, -28, "start")}
+      </g>
+
+      {/* Längen-Bemaßung */}
+      <g style={{ opacity: 0, animation: "lnd-fade 0.5s 0.6s ease-out forwards" }}>
+        {boxes.map((b, i) => HorizDim(b.x0, b.x1, dimY + (i % 2 === 0 ? 0 : 16), `${b.len}`, b.tol))}
+        {HorizDim(firstX, lastX, dimY + 34, `${total}`, undefined, true)}
+      </g>
+
+      {/* Label */}
+      <text x={VW / 2} y={VH - 10} textAnchor="middle"
+        fontFamily={FONT} fontSize={9} style={{ fill: "var(--lnd-t3)" }} letterSpacing={2}>
+        SCHNITTANSICHT · A–A · WERKSTOFF C45
       </text>
     </svg>
   );
@@ -577,11 +696,7 @@ function PartViewer() {
 
   const is2D = mode !== "solid";
 
-  const MODES: { k: ViewMode; l: string }[] = [
-    { k: "solid", l: "Volumen" },
-    { k: "profil", l: "Profil" },
-    { k: "explosion", l: "Explosion" },
-  ];
+  const MODES: { k: ViewMode; l: string }[] = [];
 
   return (
     <div className="lnd-viewer-box" ref={wrapRef}>
@@ -599,27 +714,17 @@ function PartViewer() {
         {failed && (
           <div className="lnd-viewer-overlay">3D-Ansicht in diesem Browser nicht verfügbar.</div>
         )}
-        {is2D && (
+        {mode === "zeichnung" && (
+          <div className="lnd-p2d-wrap">
+            <TechnicalDrawing />
+          </div>
+        )}
+        {(mode === "profil" || mode === "explosion") && (
           <div className="lnd-p2d-wrap">
             <Profile2D mode={mode as "profil" | "explosion"} />
           </div>
         )}
       </div>
-      {(ready || is2D) && (
-        <div className="lnd-viewer-hint">
-          {is2D ? (
-            <>
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M1.5 6.5h10M1.5 3.5v6M11.5 3.5v6" strokeLinecap="round" /></svg>
-              Maßstäbliche Ansicht mit Maßen &amp; Toleranzen
-            </>
-          ) : (
-            <>
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M6.5 1.5v3M6.5 8.5v3M1.5 6.5h3M8.5 6.5h3" strokeLinecap="round" /><circle cx="6.5" cy="6.5" r="2" /></svg>
-              Ziehen zum Drehen · Scrollen zum Zoomen
-            </>
-          )}
-        </div>
-      )}
     </div>
   );
 }
@@ -641,6 +746,8 @@ export default function LandingPage() {
   const [reduced, setReduced] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [heroPassed, setHeroPassed] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [faqOpen, setFaqOpen] = useState(false);
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactSubject, setContactSubject] = useState("Demo anfragen");
@@ -783,7 +890,6 @@ export default function LandingPage() {
             <div className="lnd-nav-links">
               <a href="#funktionen" className="lnd-nav-link">Funktionen</a>
               <a href="#praezision" className="lnd-nav-link">Präzision</a>
-              <a href="#ansicht" className="lnd-nav-link">3D-Ansicht</a>
               <a href="#kalkulation" className="lnd-nav-link">Kalkulation</a>
               <a href="#preise" className="lnd-nav-link">Preise</a>
               <a href="#kontakt" className="lnd-nav-link">Kontakt</a>
@@ -807,7 +913,6 @@ export default function LandingPage() {
           <div className="lnd-nav-drawer" data-open={navOpen}>
             <a href="#funktionen" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Funktionen</a>
             <a href="#praezision" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Präzision</a>
-            <a href="#ansicht" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>3D-Ansicht</a>
             <a href="#kalkulation" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Kalkulation</a>
             <a href="#preise" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Preise</a>
             <a href="#kontakt" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Kontakt</a>
@@ -852,7 +957,7 @@ export default function LandingPage() {
 
 
         {/* ───────── PROBLEM ───────── */}
-        <section className="lnd-section">
+        <section className="lnd-section lnd-section--alt lnd-section--compact">
           <div className="lnd-section-inner">
             <Reveal className="lnd-section-head">
               <div className="lnd-label">Das Problem</div>
@@ -904,7 +1009,7 @@ export default function LandingPage() {
         </section>
 
         {/* ───────── ABLAUF (Pipeline) ───────── */}
-        <section className="lnd-section lnd-section--alt" id="funktionen">
+        <section className="lnd-section lnd-section--compact" id="funktionen">
           <div className="lnd-section-inner">
             <Reveal className="lnd-section-head">
               <div className="lnd-label">Der Ablauf</div>
@@ -982,7 +1087,7 @@ export default function LandingPage() {
         </section>
 
         {/* ───────── PRÄZISION / GD&T ───────── */}
-        <section className="lnd-section" id="praezision">
+        <section className="lnd-section lnd-section--alt lnd-section--compact" id="praezision">
           <div className="lnd-section-inner">
             <Reveal className="lnd-section-head">
               <div className="lnd-label">Präzision</div>
@@ -1005,30 +1110,12 @@ export default function LandingPage() {
                 <span key={c} className="lnd-gdt-chip">{c}</span>
               ))}
             </Reveal>
-            <Reveal delay={260} className="lnd-ainote lnd-ainote--center">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4"><circle cx="8" cy="8" r="6.5" /><path d="M8 5v3.5M8 11h.01" strokeLinecap="round" /></svg>
-              KI-Ergebnisse sind gekennzeichnet &amp; editierbar — konform mit EU AI Act Art. 50. Keine Black Box.
-            </Reveal>
           </div>
         </section>
 
-        {/* ───────── 3D-ANSICHT ───────── */}
-        <section className="lnd-section lnd-section--alt" id="ansicht">
-          <div className="lnd-section-inner">
-            <Reveal className="lnd-section-head">
-              <div className="lnd-label">3D-Ansicht</div>
-              <h2 className="lnd-section-h2">Ihr Teil. Von allen Seiten.</h2>
-              <p className="lnd-section-lead">
-                Dasselbe interaktive 3D-Modell wie im Dashboard — drehen, zoomen und
-                zwischen Volumen-, Profil- und Explosionsansicht umschalten.
-              </p>
-            </Reveal>
-            <Reveal><PartViewer /></Reveal>
-          </div>
-        </section>
 
         {/* ───────── KALKULATION ───────── */}
-        <section className="lnd-section lnd-section--alt" id="kalkulation">
+        <section className="lnd-section lnd-section--compact" id="kalkulation">
           <div className="lnd-section-inner">
             <div className="lnd-split lnd-split--rev">
               <Reveal className="lnd-split-text">
@@ -1070,7 +1157,7 @@ export default function LandingPage() {
         </section>
 
         {/* ───────── FEATURES ───────── */}
-        <section className="lnd-section">
+        <section className="lnd-section lnd-section--alt">
           <div className="lnd-section-inner">
             <Reveal className="lnd-section-head">
               <div className="lnd-label">Funktionen</div>
@@ -1112,17 +1199,14 @@ export default function LandingPage() {
         </section>
 
         {/* ───────── PREISE ───────── */}
-        <section className="lnd-section" id="preise">
+        <section className="lnd-section lnd-section--alt" id="preise">
           <div className="lnd-section-inner">
             <Reveal className="lnd-section-head">
               <div className="lnd-label">Preise</div>
               <h2 className="lnd-section-h2">Transparent. Ohne Überraschungen.</h2>
               <p className="lnd-section-lead">
-                Starter einen Monat gratis testen, danach ein fester Monatstarif mit
-                inklusivem Anfrage-Kontingent. Pro und Enterprise direkt buchbar.
                 Eine manuelle Kalkulation kostet Sie ein Vielfaches an Arbeitszeit.
               </p>
-              <p className="lnd-pricing-note">Eine <strong>Anfrage</strong> = ein Teil (ein PDF + STEP-Paar). Staffelkalkulationen für mehrere Stückzahlen zählen als eine Anfrage.</p>
             </Reveal>
             <div className="lnd-pricing">
               <Reveal className="lnd-plan">
@@ -1137,7 +1221,6 @@ export default function LandingPage() {
                   <button className="lnd-plan-btn" onClick={() => goPlan("starter", "direct")}>Direkt buchen</button>
                 </div>
                 <ul className="lnd-plan-items">
-                  <PlanItem on>1. Monat kostenfrei</PlanItem>
                   <PlanItem on>150 Anfragen / Monat inklusive</PlanItem>
                   <PlanItem on>Weitere Anfragen: 1,00 €</PlanItem>
                   <PlanItem on>Vollständige KI-Analyse</PlanItem>
@@ -1192,73 +1275,61 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ───────── FAQ ───────── */}
-        <section className="lnd-section" id="faq">
-          <div className="lnd-section-inner">
-            <Reveal className="lnd-section-head">
-              <div className="lnd-label">FAQ</div>
-              <h2 className="lnd-section-h2">Häufige Fragen.</h2>
-            </Reveal>
-            <Reveal className="lnd-faq">
-              {[
-                {
-                  q: "Welche Dateiformate werden unterstützt?",
-                  a: "Vinyos verarbeitet technische Zeichnungen als PDF und 3D-Modelle im STEP-Format (.stp / .step). PDF + STEP werden automatisch als Paar erkannt, wenn der Dateiname übereinstimmt.",
-                },
-                {
-                  q: "Wie genau ist die Kalkulation?",
-                  a: "Die Engine berechnet Schnittzeiten, Rüstkosten und Material physikalisch — keine KI-Schätzwerte. Sie hinterlegen Ihre eigenen Stundensätze, Maschinensätze und Marge. Das Ergebnis ist ein Vorschlag, den Sie vor der Freigabe prüfen und anpassen können.",
-                },
-                {
-                  q: "Sind meine Zeichnungen und Daten sicher?",
-                  a: "Ja. Alle Daten werden ausschließlich in der EU (Frankfurt, AWS eu-central-1) gespeichert und verarbeitet. Ihre Zeichnungen werden nicht zum Training von KI-Modellen verwendet und nicht an Dritte weitergegeben. Der Dienst ist DSGVO-konform.",
-                },
-                {
-                  q: "Was ist eine Anfrage genau?",
-                  a: "Eine Anfrage entspricht einem Teil — also einem PDF + STEP-Paar. Wenn Sie für ein Teil mehrere Stückzahlen kalkulieren (z. B. 1, 10, 50 Stück), zählt das trotzdem als eine Anfrage.",
-                },
-                {
-                  q: "Kann ich Vinyos mit meinem Team nutzen?",
-                  a: "Ja. Teammitglieder teilen sich Anfragen, Angebote, Maschinen und Einstellungen — mit rollenbasiertem Zugriff (Admin, Kalkulator). Verfügbar in allen Tarifen (Starter, Pro, Enterprise).",
-                },
-              ].map(({ q, a }, i) => (
-                <details key={i} className="lnd-faq-item">
-                  <summary className="lnd-faq-q">
-                    {q}
-                    <svg className="lnd-faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M4 6l4 4 4-4" /></svg>
-                  </summary>
-                  <p className="lnd-faq-a">{a}</p>
-                </details>
-              ))}
-            </Reveal>
+        {/* ───────── CTA-BAND ───────── */}
+        <section className="lnd-cta-band">
+          <div className="lnd-cta-band-inner">
+            <div>
+              <h2 className="lnd-cta-band-h2">In Sekunden zum ersten kalkulierten Teil.</h2>
+              <p className="lnd-cta-band-sub">1. Monat gratis — keine Kreditkarte, keine Einrichtung.</p>
+            </div>
+            <div className="lnd-cta-actions" ref={ctaActionsRef}>
+              <button className="lnd-btn-white" onClick={() => go()}>
+                Kostenlos testen
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
+              </button>
+            </div>
           </div>
         </section>
 
-        {/* ───────── CTA-PANEL ───────── */}
-        <section className="lnd-cta-wrap">
-          <Reveal className="lnd-cta-panel">
-            <div className="lnd-cta-grid" />
-            <div className="lnd-cta-content">
-              <h2 className="lnd-cta-h2">In Sekunden zum ersten<br />kalkulierten Teil.</h2>
-              <p className="lnd-cta-sub">1. Monat gratis — keine Kreditkarte, keine Einrichtung.</p>
-              <div className="lnd-cta-actions" ref={ctaActionsRef}>
-                <button className="lnd-btn-primary" onClick={() => go()}>
-                  Kostenlos testen
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
-                </button>
-                <button className="lnd-btn-ghost" onClick={openCalendly}>Demo buchen</button>
+        {/* ───────── FAQ + KONTAKT ───────── */}
+        <section className="lnd-bottom" id="kontakt">
+          <div className="lnd-bottom-inner">
+
+            {/* FAQ — Trennlinien-Stil */}
+            <Reveal className="lnd-bottom-col">
+              <div className="lnd-label">FAQ</div>
+              <h2 className="lnd-bottom-h">Häufige Fragen</h2>
+              <div className="lnd-faq-lines">
+                {[
+                  { q: "Welche Dateiformate werden unterstützt?", a: "Vinyos verarbeitet technische Zeichnungen als PDF und 3D-Modelle im STEP-Format (.stp / .step). PDF + STEP werden automatisch als Paar erkannt, wenn der Dateiname übereinstimmt." },
+                  { q: "Wie genau ist die Kalkulation?", a: "Die Engine berechnet Schnittzeiten, Rüstkosten und Material physikalisch — keine KI-Schätzwerte. Sie hinterlegen Ihre eigenen Stundensätze, Maschinensätze und Marge. Das Ergebnis ist ein Vorschlag, den Sie vor der Freigabe prüfen und anpassen können." },
+                  { q: "Sind meine Zeichnungen und Daten sicher?", a: "Ja. Alle Daten werden ausschließlich in der EU (Frankfurt, AWS eu-central-1) gespeichert. Ihre Zeichnungen werden nicht zum Training von KI-Modellen verwendet. DSGVO-konform." },
+                  { q: "Was ist eine Anfrage genau?", a: "Eine Anfrage = ein Teil (PDF + STEP-Paar). Mehrere Stückzahlen für dasselbe Teil zählen als eine Anfrage." },
+                  { q: "Kann ich Vinyos mit meinem Team nutzen?", a: "Ja. Teammitglieder teilen sich Anfragen, Angebote und Einstellungen — mit rollenbasiertem Zugriff (Admin, Kalkulator). Verfügbar in allen Tarifen." },
+                ].map(({ q, a }, i) => (
+                  <details key={i} className="lnd-fql-item">
+                    <summary className="lnd-fql-q">
+                      {q}
+                      <svg className="lnd-fql-chevron" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M4 6l4 4 4-4" /></svg>
+                    </summary>
+                    <p className="lnd-fql-a">{a}</p>
+                  </details>
+                ))}
+
               </div>
-              <div className="lnd-cta-contact">
-                Abrechnung einfach per hinterlegter Kreditkarte oder auf Rechnung.
-              </div>
-            </div>
-          </Reveal>
+            </Reveal>
+
+            {/* 3D-Viewer */}
+            <Reveal delay={100} className="lnd-bottom-col lnd-bottom-viewer">
+              <PartViewer />
+            </Reveal>
+
+          </div>
         </section>
 
-        {/* ───────── KONTAKT-SEKTION ───────── */}
+        {/* ───────── KONTAKT ───────── */}
         <section id="kontakt" className="lnd-contact-wrap">
           <Reveal className="lnd-contact-inner">
-            <p className="eyebrow" style={{textAlign:"center",marginBottom:"12px"}}>Kontakt</p>
             <h2 className="lnd-contact-h2">Noch Fragen?</h2>
             <p className="lnd-contact-sub">Buchen Sie eine Live-Demo oder schreiben Sie uns — wir antworten meist innerhalb eines Werktages.</p>
             <div className="lnd-contact-demo">
@@ -1281,17 +1352,10 @@ export default function LandingPage() {
             ) : (
               <form className="lnd-contact-form" onSubmit={sendContact}>
                 <div className="lnd-contact-row">
-                  <label>
-                    Name
-                    <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Max Mustermann" required disabled={contactState === "sending"} />
-                  </label>
-                  <label>
-                    E-Mail
-                    <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="name@firma.de" required disabled={contactState === "sending"} />
-                  </label>
+                  <label>Name<input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Max Mustermann" required disabled={contactState === "sending"} /></label>
+                  <label>E-Mail<input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="name@firma.de" required disabled={contactState === "sending"} /></label>
                 </div>
-                <label>
-                  Betreff
+                <label>Betreff
                   <select value={contactSubject} onChange={(e) => setContactSubject(e.target.value)} disabled={contactState === "sending"}>
                     <option value="Demo anfragen">Demo anfragen</option>
                     <option value="Frage zum Produkt">Frage zum Produkt</option>
@@ -1299,10 +1363,7 @@ export default function LandingPage() {
                     <option value="Sonstiges">Sonstiges</option>
                   </select>
                 </label>
-                <label>
-                  Nachricht
-                  <textarea value={contactMsg} onChange={(e) => setContactMsg(e.target.value)} placeholder="Ihre Frage oder Nachricht…" rows={4} required disabled={contactState === "sending"} />
-                </label>
+                <label>Nachricht<textarea value={contactMsg} onChange={(e) => setContactMsg(e.target.value)} placeholder="Ihre Frage oder Nachricht…" rows={4} required disabled={contactState === "sending"} /></label>
                 {contactState === "error" && (
                   <p className="lnd-contact-error">Fehler beim Senden. Bitte schreiben Sie direkt an <a href="mailto:kontakt@vinyos.de">kontakt@vinyos.de</a>.</p>
                 )}
@@ -1615,7 +1676,7 @@ const CSS = `
   }
 
   /* HERO */
-  .lnd-hero { position: relative; overflow: hidden; padding: 84px 32px 92px; opacity: 0; }
+  .lnd-hero { position: relative; overflow: hidden; padding: 84px 32px 92px; opacity: 0; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
   .lnd-hero--visible { animation: hero-intro 0.9s cubic-bezier(.22,.68,0,1) forwards; }
   .lnd-hero-dots {
     position: absolute; inset: 0; pointer-events: none;
@@ -1728,8 +1789,9 @@ const CSS = `
   .lnd-trust-tag { font: 500 12px/1 var(--lnd-f-ui); color: var(--lnd-t2); border: 1px solid var(--lnd-border); border-radius: 100px; padding: 7px 14px; }
 
   /* SECTIONS */
-  .lnd-section { padding: 96px 32px; }
+  .lnd-section { padding: 96px 32px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
   .lnd-section--alt { background: var(--lnd-bg-alt); }
+  .lnd-section--compact { min-height: unset; }
   .lnd-section-inner { max-width: 1100px; margin: 0 auto; }
   .lnd-section-head { text-align: center; margin-bottom: 52px; }
   .lnd-label { font: 600 11px/1 var(--lnd-f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--lnd-accent); margin-bottom: 14px; }
@@ -1894,6 +1956,7 @@ const CSS = `
       var(--lnd-surface);
   }
   .lnd-p2d-svg { width: 100%; height: 100%; }
+  .lnd-td-svg { width: 100%; height: 100%; }
   @keyframes lnd-fade { from { opacity: 0; } to { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) {
     .lnd-p2d-svg [style*="lnd-fade"] { animation: none !important; opacity: 1 !important; }
@@ -1933,7 +1996,7 @@ const CSS = `
   .lnd-feature-desc { font-family: var(--lnd-f-body); font-size: 14px; color: var(--lnd-t2); line-height: 1.65; margin: 0; }
 
   /* STATS BAND */
-  .lnd-band { position: relative; overflow: hidden; background: var(--lnd-surface); border-top: 1px solid var(--lnd-border); border-bottom: 1px solid var(--lnd-border); padding: 64px 32px; }
+  .lnd-band { position: relative; overflow: hidden; background: var(--lnd-bg); border-top: 1px solid var(--lnd-border); border-bottom: 1px solid var(--lnd-border); padding: 64px 32px; }
   .lnd-band-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgb(var(--lnd-accent-rgb) /0.10) 0%, transparent 70%); }
   .lnd-band-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
   .lnd-band-item { text-align: center; }
@@ -1980,28 +2043,17 @@ const CSS = `
   .lnd-pricing-note a:hover { color: var(--lnd-accent-h); }
 
   /* CTA-PANEL */
-  .lnd-cta-wrap { padding: 40px 32px 96px; }
+  .lnd-cta-wrap { padding: 96px 32px; background: var(--lnd-bg-alt); }
   .lnd-cta-panel {
     position: relative; overflow: hidden;
     max-width: 1100px; margin: 0 auto;
-    background: var(--lnd-surface);
-    border: 1px solid var(--lnd-border-s); border-radius: 4px;
     padding: 72px 32px;
   }
-  .lnd-cta-panel::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--lnd-accent), transparent); opacity: 0.7;
-  }
-  .lnd-cta-grid {
-    position: absolute; inset: 0; pointer-events: none;
-    background:
-      radial-gradient(ellipse 50% 80% at 50% 0%, rgb(var(--lnd-accent-rgb) /0.16) 0%, transparent 60%),
-      repeating-linear-gradient(0deg, transparent 0 31px, rgb(var(--lnd-accent-rgb) /0.05) 31px 32px),
-      repeating-linear-gradient(90deg, transparent 0 31px, rgb(var(--lnd-accent-rgb) /0.05) 31px 32px);
-    mask-image: radial-gradient(ellipse 70% 100% at 50% 0%, #000 0%, transparent 75%);
-    -webkit-mask-image: radial-gradient(ellipse 70% 100% at 50% 0%, #000 0%, transparent 75%);
-  }
-  .lnd-cta-content { position: relative; z-index: 1; text-align: center; max-width: 600px; margin: 0 auto; }
+  .lnd-cta-grid { display: none; }
+  .lnd-cta-split { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: stretch; min-height: 500px; }
+  .lnd-cta-viewer { border-radius: 4px; overflow: hidden; min-height: 400px; }
+  .lnd-cta-viewer .lnd-viewer-box { height: 100%; }
+  .lnd-cta-content { text-align: left; display: flex; flex-direction: column; justify-content: center; }
   .lnd-cta-h2 { font: 700 42px/1.12 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 14px; letter-spacing: -0.02em; }
   .lnd-cta-sub { font-family: var(--lnd-f-body); font-size: 16px; color: var(--lnd-t2); margin: 0 0 32px; }
   .lnd-cta-actions { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
@@ -2019,9 +2071,113 @@ const CSS = `
   @media (prefers-reduced-motion: reduce) {
     .lnd-cta-actions::before { transform: translate(-50%, -50%) scale(1); transition: opacity 140ms ease; }
   }
+  .lnd-cta-faq-col { display: flex; flex-direction: column; justify-content: center; }
+  .lnd-cta-faq-h2 { font: 700 36px/1.15 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 24px; letter-spacing: -0.01em; }
+  .lnd-cta-faq-col .lnd-faq { max-width: none; margin: 0; }
+  .lnd-cta-faq-col .lnd-faq-item { border-radius: 4px; }
+  .lnd-cta-faq-col .lnd-faq-q { text-align: left; }
+  .lnd-cta-faq-col .lnd-faq-a { text-align: left; }
+
+  /* CTA-BAND */
+  .lnd-cta-band { background: var(--lnd-accent); padding: 56px 32px; }
+  .lnd-cta-band-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+  .lnd-cta-band-h2 { font: 700 36px/1.1 var(--lnd-f-display); color: #fff; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .lnd-cta-band-sub { font-family: var(--lnd-f-body); font-size: 15px; color: rgba(255,255,255,0.75); margin: 0; }
+  .lnd-btn-white {
+    display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;
+    background: #fff; color: var(--lnd-accent); border: none; border-radius: 2px;
+    padding: 14px 22px; font: 600 14px/1 var(--lnd-f-ui); cursor: pointer; white-space: nowrap;
+    transition: opacity 140ms, transform 140ms;
+  }
+  .lnd-btn-white:hover { opacity: 0.9; transform: translateY(-1px); }
+
   .lnd-cta-contact { margin-top: 28px; font: 500 13px/1.5 var(--lnd-f-mono); color: var(--lnd-t3); }
   .lnd-cta-contact a { color: var(--lnd-accent); text-decoration: none; }
   .lnd-cta-contact a:hover { color: var(--lnd-accent-h); }
+
+  /* FINALE SEKTION */
+  .lnd-final {
+    position: relative; overflow: hidden;
+    background: var(--lnd-bg);
+    border-top: 1px solid var(--lnd-border);
+  }
+  .lnd-final-glow {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 500px; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse 65% 55% at 50% 0%, rgb(var(--lnd-accent-rgb) /0.13) 0%, transparent 68%);
+  }
+  .lnd-final-top {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto; padding: 100px 32px 80px;
+    display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center;
+  }
+  .lnd-final-h2 {
+    font: 700 54px/1.08 var(--lnd-f-display); color: var(--lnd-tx);
+    letter-spacing: -0.028em; margin: 0;
+  }
+  .lnd-final-lead {
+    font-family: var(--lnd-f-body); font-size: 16px; color: var(--lnd-t2); margin: 0;
+  }
+  .lnd-btn-primary--lg { padding: 16px 28px; font-size: 15px; margin-top: 6px; }
+  .lnd-final-divider { padding: 0 32px; }
+  .lnd-final-divider-inner { max-width: 1100px; margin: 0 auto; height: 1px; background: var(--lnd-border); }
+  .lnd-final-split {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto; padding: 72px 32px 96px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+  }
+  .lnd-final-col { display: flex; flex-direction: column; }
+  .lnd-final-col-h {
+    font: 600 22px/1.3 var(--lnd-f-display); color: var(--lnd-tx);
+    margin: 0 0 20px; letter-spacing: -0.01em;
+  }
+  .lnd-final-col-sub {
+    font-family: var(--lnd-f-body); font-size: 14px; color: var(--lnd-t2);
+    margin: -12px 0 22px; line-height: 1.6;
+  }
+  .lnd-faq--final { max-width: none; margin: 0; }
+  .lnd-faq--final .lnd-faq-item { border-radius: 4px; }
+
+  /* FAQ + KONTAKT NEBENEINANDER */
+  .lnd-bottom { background: var(--lnd-bg-alt); border-top: 1px solid var(--lnd-border); padding: 80px 32px 96px; }
+  .lnd-bottom-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: stretch; }
+  .lnd-bottom-col { display: flex; flex-direction: column; }
+  .lnd-bottom-h { font: 700 28px/1.2 var(--lnd-f-display); color: var(--lnd-tx); margin: 0 0 28px; letter-spacing: -0.015em; }
+  .lnd-bottom-sub { font-family: var(--lnd-f-body); font-size: 14px; color: var(--lnd-t2); margin: -16px 0 24px; line-height: 1.6; }
+  .lnd-bottom-viewer { min-height: 0; }
+  .lnd-bottom-viewer .lnd-viewer-box { height: 100%; }
+  .lnd-bottom-viewer .lnd-viewer-stage { height: 100%; min-height: 0; }
+
+  /* Trennlinien-FAQ */
+  .lnd-faq-lines { display: flex; flex-direction: column; border-top: 1px solid var(--lnd-border); }
+  .lnd-fql-item { border-bottom: 1px solid var(--lnd-border); }
+  .lnd-fql-q {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 15px 0; width: 100%; background: none; border: none; cursor: pointer;
+    font: 500 14px/1.45 var(--lnd-f-ui); color: var(--lnd-t1); text-align: left;
+    transition: color 120ms; list-style: none; user-select: none;
+  }
+  .lnd-fql-q::-webkit-details-marker { display: none; }
+  .lnd-fql-q:hover { color: var(--lnd-tx); }
+  .lnd-fql-chevron { flex-shrink: 0; color: var(--lnd-t4); transition: transform 0.2s, color 0.15s; }
+  .lnd-fql-item[open] .lnd-fql-chevron { transform: rotate(180deg); color: var(--lnd-accent); }
+  .lnd-fql-a { padding: 0 0 15px; font: 400 13px/1.7 var(--lnd-f-body); color: var(--lnd-t2); margin: 0; }
+
+  /* FAQ FOOTER */
+  .lnd-faq-wrap { border-top: 1px solid var(--lnd-border); background: var(--lnd-bg); padding: 48px 32px 56px; }
+  .lnd-faq-wrap-inner { max-width: 720px; margin: 0 auto; }
+  .lnd-faq-wrap-label { font: 600 11px/1 var(--lnd-f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--lnd-accent); margin: 0 0 20px; }
+  .lnd-faq-toggle {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 0; background: none; border: none; cursor: pointer;
+    font: 600 15px/1 var(--lnd-f-ui); color: var(--lnd-t2);
+    transition: color 140ms;
+  }
+  .lnd-faq-toggle:hover { color: var(--lnd-tx); }
+  .lnd-faq-toggle-icon { color: var(--lnd-t4); transition: transform 0.22s ease, color 0.14s; flex-shrink: 0; }
+  .lnd-faq-toggle-icon.is-open { transform: rotate(180deg); color: var(--lnd-accent); }
+  .lnd-faq--footer { max-width: none; margin: 0 0 28px; animation: lnd-fade 0.2s ease; }
+  .lnd-faq--footer .lnd-faq-item { border-radius: 4px; }
 
   /* FOOTER */
   .lnd-footer { padding: 32px; border-top: 1px solid var(--lnd-rule); }
@@ -2102,6 +2258,10 @@ const CSS = `
     .lnd-nav-drawer-cta { width: 100%; justify-content: center; margin-top: 16px; }
     .lnd-cta-h2 { font-size: 32px; }
     .lnd-cta-panel { padding: 56px 24px; }
+    .lnd-cta-split { grid-template-columns: 1fr; }
+    .lnd-cta-viewer { min-height: 360px; }
+    .lnd-cta-band-inner { flex-direction: column; align-items: flex-start; gap: 24px; }
+    .lnd-cta-band-h2 { font-size: 28px; }
     .lnd-sticky-cta {
       display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
       padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
@@ -2116,6 +2276,10 @@ const CSS = `
     .lnd-sticky-cta-txt { flex: 1; font: 500 13px/1.3 var(--lnd-f-ui); color: var(--lnd-t2); }
     .lnd-sticky-cta .lnd-btn-primary { flex-shrink: 0; }
     .lnd-footer { padding-bottom: 96px; }
+    .lnd-final-h2 { font-size: 38px; }
+    .lnd-final-split { grid-template-columns: 1fr; gap: 48px; padding: 56px 24px 80px; }
+    .lnd-final-top { padding: 72px 24px 60px; }
+    .lnd-bottom-inner { grid-template-columns: 1fr; gap: 48px; }
   }
   @media (max-width: 768px) {
     .lnd-section { padding: 72px 24px; }
@@ -2198,7 +2362,9 @@ const CSS = `
   .lnd-contact-form input::placeholder, .lnd-contact-form textarea::placeholder { color: var(--lnd-t3); }
   .lnd-contact-error { font: 400 13px/1.5 var(--lnd-f-ui); color: var(--lnd-danger); }
   .lnd-contact-error a { color: var(--lnd-danger); }
-  .lnd-contact-submit { align-self: flex-start; }
+  .lnd-contact-toggle { display: inline-flex; align-items: center; gap: 8px; }
+  .lnd-contact-form--open { animation: lnd-fade 0.25s ease; }
+  .lnd-contact-submit { align-self: center; }
   .lnd-contact-submit:disabled { opacity: 0.6; cursor: not-allowed; }
   .lnd-contact-success {
     display: flex; flex-direction: column; align-items: center; gap: 12px;
