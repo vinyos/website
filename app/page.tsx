@@ -1283,13 +1283,13 @@ export default function LandingPage() {
               <p className="lnd-cta-band-sub">1. Monat gratis — keine Kreditkarte, keine Einrichtung.</p>
             </div>
             <div className="lnd-cta-actions" ref={ctaActionsRef}>
-              <button className="lnd-btn-white" onClick={() => go()}>
-                Kostenlos testen
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
-              </button>
               <button className="lnd-btn-white-outline" onClick={openCalendly}>
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="3" width="11" height="10" rx="1.5" /><path d="M5 2v2M10 2v2M2 6h11" /></svg>
                 Demo buchen
+              </button>
+              <button className="lnd-btn-white" onClick={() => go()}>
+                Kostenlos testen
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
               </button>
             </div>
           </div>
