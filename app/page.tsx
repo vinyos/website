@@ -1287,6 +1287,10 @@ export default function LandingPage() {
                 Kostenlos testen
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
               </button>
+              <button className="lnd-btn-white-outline" onClick={openCalendly}>
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="3" width="11" height="10" rx="1.5" /><path d="M5 2v2M10 2v2M2 6h11" /></svg>
+                Demo buchen — 30 Min.
+              </button>
             </div>
           </div>
         </section>
@@ -1331,17 +1335,7 @@ export default function LandingPage() {
         <section id="kontakt" className="lnd-contact-wrap">
           <Reveal className="lnd-contact-inner">
             <h2 className="lnd-contact-h2">Noch Fragen?</h2>
-            <p className="lnd-contact-sub">Buchen Sie eine Live-Demo oder schreiben Sie uns — wir antworten meist innerhalb eines Werktages.</p>
-            <div className="lnd-contact-demo">
-              <button className="lnd-btn-primary lnd-contact-demo-btn" onClick={openCalendly}>
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="3" width="11" height="10" rx="1.5" /><path d="M5 2v2M10 2v2M2 6h11" /></svg>
-                Demo buchen — 30 Min.
-              </button>
-              <span className="lnd-contact-demo-hint">Kostenlos · Kein Skript · Ihr echter Anwendungsfall</span>
-            </div>
-            <div className="lnd-contact-divider">
-              <span>oder schreiben Sie uns</span>
-            </div>
+            <p className="lnd-contact-sub">Schreiben Sie uns — wir antworten meist innerhalb eines Werktages.</p>
             {contactState === "done" ? (
               <div className="lnd-contact-success">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="20" cy="20" r="18" /><path d="M12 20l6 6 10-12" /></svg>
@@ -2090,6 +2084,13 @@ const CSS = `
     transition: opacity 140ms, transform 140ms;
   }
   .lnd-btn-white:hover { opacity: 0.9; transform: translateY(-1px); }
+  .lnd-btn-white-outline {
+    display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;
+    background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,0.55); border-radius: 2px;
+    padding: 14px 22px; font: 600 14px/1 var(--lnd-f-ui); cursor: pointer; white-space: nowrap;
+    transition: border-color 140ms, background 140ms, transform 140ms;
+  }
+  .lnd-btn-white-outline:hover { border-color: #fff; background: rgba(255,255,255,0.10); transform: translateY(-1px); }
 
   .lnd-cta-contact { margin-top: 28px; font: 500 13px/1.5 var(--lnd-f-mono); color: var(--lnd-t3); }
   .lnd-cta-contact a { color: var(--lnd-accent); text-decoration: none; }
