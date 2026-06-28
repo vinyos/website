@@ -4,6 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Vinyos Quote – KI-Kalkulation für CNC-Drehteile | Angebot in 60 Sekunden",
+  icons: { icon: "/favicon.svg" },
   description: "Vinyos Quote analysiert Ihre Zeichnung (PDF + STEP) automatisch und kalkuliert Drehteile in unter 60 Sekunden — mit Ihren Stundensätzen, 84 Werkstoffen und 14 GD&T-Toleranzen. Kostenlos testen.",
   openGraph: {
     title: "Vinyos Quote – KI-Kalkulation für CNC-Drehteile",
