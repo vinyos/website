@@ -23,13 +23,8 @@ export default function OgImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
-          <svg width="56" height="56" viewBox="0 0 32 32" fill="none">
-            <g stroke="#3f7d7b" strokeWidth="2" strokeLinecap="square" fill="none">
-              <path d="M5 8 L5 26 L10 26" />
-              <path d="M27 8 L27 26 L22 26" />
-              <path d="M10 22 L22 22" />
-              <path d="M16 22 L16 10" />
-            </g>
+          <svg width="56" height="56" viewBox="0 0 40 40" fill="none">
+            <path d="M20 8 V31 M9 31 H31" stroke="#3f7d7b" strokeWidth="5" strokeLinecap="round" />
           </svg>
           <div style={{ display: "flex", fontSize: "40px", color: "#141413", fontWeight: 600 }}>
             vinyos
