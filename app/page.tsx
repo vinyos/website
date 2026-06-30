@@ -884,7 +884,7 @@ export default function LandingPage() {
           <div className="lnd-nav-inner">
             <div className="lnd-logo">
               <span className="lnd-logo-name">VINYOS</span>
-              <span className="lnd-logo-sep">⟂</span>
+              <span className="lnd-logo-mark">⟂</span>
               <span className="lnd-logo-product">QUOTE</span>
             </div>
             <div className="lnd-nav-links">
@@ -1375,7 +1375,7 @@ export default function LandingPage() {
           <div className="lnd-footer-inner">
             <div className="lnd-logo">
               <span className="lnd-logo-name">VINYOS</span>
-              <span className="lnd-logo-sep">⟂</span>
+              <span className="lnd-logo-mark">⟂</span>
               <span className="lnd-logo-product">QUOTE</span>
             </div>
             <div className="lnd-footer-links">
@@ -1601,7 +1601,7 @@ const CSS = `
   /* LOGO */
   .lnd-logo { display: flex; align-items: baseline; flex-shrink: 0; }
   .lnd-logo-name { font-family: var(--lnd-f-display); font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lnd-tx); }
-  .lnd-logo-sep { color: var(--lnd-accent); font-size: 15px; margin: 0 5px; }
+  .lnd-logo-mark { color: var(--lnd-accent); font-size: 15px; margin: 0 5px; -webkit-text-stroke: 1px var(--lnd-accent); }
   .lnd-logo-product { font-family: var(--lnd-f-display); font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lnd-t2); }
 
   /* BUTTONS */
