@@ -731,13 +731,18 @@ function PartViewer() {
 
 export default function LandingPage() {
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.vinyos.de";
-  const go = (next?: string) => {
-    window.location.href = next
-      ? `${APP_URL}/login?next=${encodeURIComponent(next)}`
-      : `${APP_URL}/login`;
+  // Bestandskunden-Login — eigener, unauffälliger Einstiegspunkt in der Nav.
+  const LOGIN_URL = `${APP_URL}/login`;
+  // Trial-/Buchen-CTAs führen auf die Registrierung. Die App hat keine eigene
+  // /signup-Route: `/login` rendert „Anmelden" und „Registrieren" als Tabs
+  // (View "signin" | "signup"), `view=signup` wählt den Registrieren-Tab vor.
+  const goSignup = (next?: string) => {
+    const params = new URLSearchParams({ view: "signup" });
+    if (next) params.set("next", next);
+    window.location.href = `${LOGIN_URL}?${params.toString()}`;
   };
   const goPlan = (plan: "starter" | "pro" | "enterprise", mode: "trial" | "direct") =>
-    go(`/einstellungen/tarif?plan=${plan}&mode=${mode}`);
+    goSignup(`/einstellungen/tarif?plan=${plan}&mode=${mode}`);
 
   const heroRef = useRef<HTMLElement>(null);
   const ctaActionsRef = useRef<HTMLDivElement>(null);
@@ -895,8 +900,9 @@ export default function LandingPage() {
               <a href="#kontakt" className="lnd-nav-link">Kontakt</a>
             </div>
             <ThemeToggle />
+            <a className="lnd-nav-signin" href={LOGIN_URL}>Anmelden</a>
             <button className="lnd-btn-demo-nav" onClick={openCalendly}>Demo buchen</button>
-            <button className="lnd-btn-nav" onClick={() => go()}>Kostenlos testen</button>
+            <button className="lnd-btn-nav" onClick={() => goSignup()}>Kostenlos testen</button>
             <button
               className="lnd-nav-burger"
               aria-label={navOpen ? "Menü schließen" : "Menü öffnen"}
@@ -916,8 +922,9 @@ export default function LandingPage() {
             <a href="#kalkulation" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Kalkulation</a>
             <a href="#preise" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Preise</a>
             <a href="#kontakt" className="lnd-nav-drawer-link" onClick={() => setNavOpen(false)}>Kontakt</a>
-            <button className="lnd-btn-primary lnd-nav-drawer-cta" onClick={() => { setNavOpen(false); go(); }}>Kostenlos testen</button>
+            <button className="lnd-btn-primary lnd-nav-drawer-cta" onClick={() => { setNavOpen(false); goSignup(); }}>Kostenlos testen</button>
             <button className="lnd-btn-outline lnd-nav-drawer-cta" onClick={() => { setNavOpen(false); openCalendly(); }}>Demo buchen</button>
+            <a className="lnd-btn-ghost lnd-nav-drawer-cta lnd-nav-drawer-signin" href={LOGIN_URL} onClick={() => setNavOpen(false)}>Bereits Kunde? Anmelden</a>
           </div>
         </nav>
 
@@ -936,7 +943,7 @@ export default function LandingPage() {
                   Für CNC-Lohnfertiger im DACH-Raum: Zeichnung (PDF + STEP) hochladen, Geometrie und Toleranzen werden automatisch erkannt — und ein präziser Angebotspreis mit Ihren Stundensätzen berechnet.
                 </p>
                 <div className="lnd-hero-cta">
-                  <button className="lnd-btn-primary" onClick={() => go()}>
+                  <button className="lnd-btn-primary" onClick={() => goSignup()}>
                     Kostenlos testen
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
                   </button>
@@ -1210,11 +1217,11 @@ export default function LandingPage() {
             </Reveal>
             <div className="lnd-pricing">
               <Reveal className="lnd-plan">
-                <div className="lnd-plan-badge lnd-plan-badge--free">1. Monat gratis</div>
+                <div className="lnd-plan-badge lnd-plan-badge--free">7 Tage gratis</div>
                 <div className="lnd-plan-head">
                   <div className="lnd-plan-name">Starter</div>
                   <div className="lnd-plan-price"><span className="lnd-plan-amount">189 €</span><span className="lnd-plan-period">/ Monat</span></div>
-                  <p className="lnd-plan-sub">150 Anfragen/Monat · 1. Monat kostenfrei · monatlich kündbar.</p>
+                  <p className="lnd-plan-sub">150 Anfragen/Monat · 7 Tage kostenlos testen mit 25 Anfragen · monatlich kündbar.</p>
                 </div>
                 <div className="lnd-plan-cta">
                   <button className="lnd-plan-btn lnd-plan-btn--featured" onClick={() => goPlan("starter", "trial")}>Gratis testen</button>
@@ -1280,14 +1287,14 @@ export default function LandingPage() {
           <div className="lnd-cta-band-inner">
             <div>
               <h2 className="lnd-cta-band-h2">In Sekunden zum ersten kalkulierten Teil.</h2>
-              <p className="lnd-cta-band-sub">Buchen Sie eine Live-Demo oder testen Sie einen Monat kostenlos.</p>
+              <p className="lnd-cta-band-sub">Buchen Sie eine Live-Demo oder testen Sie 7 Tage kostenlos — 25 Anfragen gratis.</p>
             </div>
             <div className="lnd-cta-actions" ref={ctaActionsRef}>
               <button className="lnd-btn-white-outline" onClick={openCalendly}>
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="3" width="11" height="10" rx="1.5" /><path d="M5 2v2M10 2v2M2 6h11" /></svg>
                 Demo buchen
               </button>
-              <button className="lnd-btn-white" onClick={() => go()}>
+              <button className="lnd-btn-white" onClick={() => goSignup()}>
                 Kostenlos testen
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
               </button>
@@ -1391,8 +1398,8 @@ export default function LandingPage() {
         {/* ───────── STICKY CTA (mobil) ───────── */}
         <div className="lnd-sticky-cta" data-show={heroPassed && !navOpen}>
           <div className="lnd-sticky-cta-inner">
-            <span className="lnd-sticky-cta-txt">1. Monat gratis testen</span>
-            <button className="lnd-btn-primary" onClick={() => go()}>
+            <span className="lnd-sticky-cta-txt">7 Tage gratis testen</span>
+            <button className="lnd-btn-primary" onClick={() => goSignup()}>
               Starten
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M2 7h10M8 3l4 4-4 4" /></svg>
             </button>
@@ -2189,6 +2196,16 @@ const CSS = `
   .lnd-footer-copy { font-size: 12px; color: var(--lnd-t3); }
 
   /* RESPONSIVE */
+  /* 961–1030px: Die Nav wird eng, sobald „Anmelden" neben Demo- und Trial-CTA
+     steht (Burger greift erst ab 960px). Abstände zusammenziehen, damit alle
+     Einstiegspunkte sichtbar bleiben statt abgeschnitten zu werden. */
+  @media (min-width: 961px) and (max-width: 1030px) {
+    .lnd-nav-inner { gap: 4px; }
+    .lnd-nav-links { margin-left: 8px; gap: 0; }
+    .lnd-nav-link { padding: 6px 9px; }
+    .lnd-nav-signin { padding: 0 2px; }
+  }
+
   @media (max-width: 960px) {
     .lnd-hero-grid { grid-template-columns: 1fr; gap: 40px; }
     .lnd-hero-right { justify-content: flex-start; }
@@ -2257,6 +2274,8 @@ const CSS = `
     }
     .lnd-nav-drawer-link:active { color: var(--lnd-accent-h); }
     .lnd-nav-drawer-cta { width: 100%; justify-content: center; margin-top: 16px; }
+    .lnd-nav-drawer-signin { margin-top: 8px; font-size: 14px; color: var(--lnd-t2); }
+    .lnd-nav-drawer-signin:active { color: var(--lnd-accent-h); }
     .lnd-cta-h2 { font-size: 32px; }
     .lnd-cta-panel { padding: 56px 24px; }
     .lnd-cta-split { grid-template-columns: 1fr; }
