@@ -56,7 +56,7 @@ Sentry is wired through `next.config.ts` (`withSentryConfig`), `instrumentation.
 
 ## Pricing
 
-The pricing section in `app/page.tsx` (`id="preise"`) mirrors the single source of truth `business/pricing.md` in the parent Vinyos-Overview workspace (outside this repo). Current model: 3 plans — Starter (189 €/150 Anfragen), Pro (349 €/350), Enterprise (579 €/700) — with 1,00 € overage and a free first month. **When pricing changes, update both `pricing.md` and this section together.**
+The pricing section in `app/page.tsx` (`id="preise"`) mirrors the single source of truth `business/pricing.md` in the parent Vinyos-Overview workspace (outside this repo). Current model: 3 plans — Starter (189 €/150 Anfragen), Pro (349 €/350), Enterprise (579 €/700) — with 1,00 € overage and a **7-day trial (25 Anfragen)**, shortened from the former free first month on 2026-08-21. The trial duration and quota live in the database (`organizations.trial_ends_at` / `monthly_quota`, set by `create_org_for_new_user`) and are mirrored in `vinyos-quote/lib/plans.ts` as `TRIAL_DAYS` / `TRIAL_QUOTA` — Stripe carries no `trial_period_days`. **When pricing or the trial changes, update `pricing.md`, this section, the pricing section in `app/page.tsx` AND the SEO metadata in `app/layout.tsx` together** — the last one was missed on 2026-08-21 and kept promising a free month in Google snippets.
 
 ## Pre-launch status
 
