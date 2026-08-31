@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+---
+
+## Sprache & Schreibweise — WICHTIG
+
+⚠️ **Vor jedem kundensichtbaren Text `../docs/schreibweise.md` lesen.** Dort stehen die
+verbindlichen Regeln für App und Website: Anrede (durchgängig Sie, auch Imperative),
+Satzzeichen (**keine Gedankenstriche**), Produktname (immer „Vinyos Quote", nie nur
+„Vinyos"), Textlänge (höchstens drei Sätze, Titel höchstens vier Wörter), Zahlen und
+Einheiten, und die wiederkehrenden Bausteine für Leerzustände, Knöpfe, Fehlermeldungen
+und Platzhalter.
+
+Die Datei enthält auch die Grep-Befehle, mit denen sich Rückfälle finden lassen.
 ## Commands
 
 ```bash
