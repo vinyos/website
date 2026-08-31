@@ -36,6 +36,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# claude code — Worktrees und lokale Einstellungen
+# (.claude/settings.json bleibt getrackt: bereits versionierte Dateien
+#  ignoriert git nicht nachträglich)
+.claude/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
