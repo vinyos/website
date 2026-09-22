@@ -18,11 +18,11 @@ export async function POST(req: NextRequest) {
     html: `
       <div style="font-family: sans-serif; max-width: 600px; color: #333;">
         <h2 style="margin-bottom: 8px;">Neue Kontaktanfrage</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>E-Mail:</strong> <a href="mailto:${email}">${email}</a></p>
-        <p><strong>Betreff:</strong> ${subject}</p>
+        <p><strong>Name:</strong> ${esc(name)}</p>
+        <p><strong>E-Mail:</strong> <a href="mailto:${esc(email)}">${esc(email)}</a></p>
+        <p><strong>Betreff:</strong> ${esc(subject)}</p>
         <hr style="border:none;border-top:1px solid #eee;margin:16px 0;" />
-        <p style="white-space:pre-wrap;">${message.replace(/</g, "&lt;")}</p>
+        <p style="white-space:pre-wrap;">${esc(message)}</p>
       </div>
     `,
   });
@@ -33,4 +33,21 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ ok: true });
+}
+
+/**
+ * Entschärft alle vier Formularfelder für die HTML-Fassung der Mail. Vorher
+ * wurde nur "<" in der Nachricht ersetzt, wodurch Anführungszeichen und
+ * spitze Klammern in Name, E-Mail und Betreff ungeschützt blieben. Wer sie
+ * verwendet, kann aus dem vorgesehenen Kontext ausbrechen. Reihenfolge ist
+ * wichtig: das kaufmännische Und zuerst, sonst werden die eigenen
+ * Ersetzungen wieder zerstört.
+ */
+function esc(s: string): string {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
