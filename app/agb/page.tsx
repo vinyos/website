@@ -51,7 +51,7 @@ export default function Agb() {
 
           <div className="legal-section">
             <h2>§ 10 Vergütung & Zahlung</h2>
-            <p>Die Vergütung richtet sich nach dem gewählten Tarif oder der individuellen Vereinbarung. Reguläre Tarife werden monatlich über den Zahlungsdienstleister Stripe per Kreditkarte oder SEPA-Lastschrift abgerechnet, individuelle Vereinbarungen per Rechnung (Überweisung). Alle Preise verstehen sich netto zuzüglich der gesetzlichen Umsatzsteuer.</p>
+            <p>Die Vergütung richtet sich nach dem gewählten Tarif oder der individuellen Vereinbarung. Reguläre Tarife (Starter, Pro, Enterprise) werden monatlich über den Zahlungsdienstleister Stripe per Kreditkarte oder SEPA-Lastschrift abgerechnet. Individuelle Vereinbarungen (Beta- und Custom-Konditionen) werden per Rechnung (Überweisung) mit einem Zahlungsziel von 14 Tagen netto abgerechnet. Alle Preise verstehen sich netto zuzüglich der gesetzlichen Umsatzsteuer.</p>
           </div>
 
           <div className="legal-section">
