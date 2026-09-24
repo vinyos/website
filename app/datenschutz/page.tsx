@@ -1,15 +1,8 @@
+import LegalPage from "../_legal/LegalPage";
+
 export default function Datenschutz() {
   return (
-    <>
-      <style>{CSS}</style>
-      <div className="legal-root">
-        <div className="legal-inner">
-          <a href="/" className="legal-back">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M9 2L4 7l5 5" /></svg>
-            Zurück
-          </a>
-          <h1 className="legal-h1">Datenschutzerklärung</h1>
-          <p className="legal-meta">Stand: Juni 2026</p>
+    <LegalPage title="Datenschutzerklärung" meta="Stand: September 2026" current="/datenschutz">
 
           <div className="legal-section">
             <h2>1. Verantwortlicher</h2>
@@ -48,52 +41,37 @@ export default function Datenschutz() {
           </div>
 
           <div className="legal-section">
-            <h2>5. Künstliche Intelligenz & kein Training</h2>
+            <h2>5. Zahlungsabwicklung (Stripe)</h2>
+            <p>Die Bezahlung der regulären Tarife wickeln wir über <strong>Stripe Payments Europe, Ltd.</strong>, 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland, ab. Bei der Buchung eines Tarifs geben Sie Ihre Zahlungsdaten (Kreditkarte oder SEPA-Lastschrift), Ihre Rechnungsanschrift und gegebenenfalls Ihre Umsatzsteuer-Identifikationsnummer direkt bei Stripe ein. Vinyos AI UG speichert davon nur die Stripe-Kundennummer, die Abonnementnummer, den Abonnementstatus und das Ende des Abrechnungszeitraums, keine Karten- oder Kontodaten.</p>
+            <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung) sowie Art. 6 Abs. 1 lit. c DSGVO (steuer- und handelsrechtliche Aufbewahrungspflichten). Stripe verarbeitet die Daten zur Zahlungsabwicklung, zur Betrugsprävention und zur Erfüllung gesetzlicher Pflichten in eigener Verantwortung. Dabei können Daten an Stripe, Inc. in den USA übermittelt werden; die Übermittlung ist durch das EU-US Data Privacy Framework und Standardvertragsklauseln abgesichert. Weitere Informationen: <a href="https://stripe.com/de/privacy" target="_blank" rel="noopener noreferrer">stripe.com/de/privacy</a>.</p>
+          </div>
+
+          <div className="legal-section">
+            <h2>6. Künstliche Intelligenz & kein Training</h2>
             <p>Die Analyse erfolgt KI-gestützt (Claude via AWS Bedrock, EU). Ergebnisse sind unverbindliche Vorschläge. <strong>Ihre Daten werden nicht zum Training von KI-Modellen verwendet</strong> und nicht zu diesem Zweck weitergegeben. Ein Transparenzhinweis gemäß Art. 50 KI-VO erfolgt im Produkt.</p>
           </div>
 
           <div className="legal-section">
-            <h2>6. Speicherdauer & Löschung</h2>
+            <h2>7. Speicherdauer & Löschung</h2>
             <p>Daten werden bis zur Kontolöschung verarbeitet. Datenexport (Art. 15/20 DSGVO) und Kontolöschung (Art. 17 DSGVO) sind als Self-Service in den Einstellungen verfügbar. Steuerrelevante Angebotsdaten werden gemäß § 147 AO 10 Jahre aufbewahrt (Anonymisierung statt Löschung).</p>
           </div>
 
           <div className="legal-section">
-            <h2>7. Ihre Rechte</h2>
+            <h2>8. Ihre Rechte</h2>
             <p>Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO). Kontakt: <a href="mailto:datenschutz@vinyos.de">datenschutz@vinyos.de</a>.</p>
             <p style={{marginTop: "8px"}}>Beschwerderecht bei der zuständigen Aufsichtsbehörde: <strong>Der Hessische Beauftragte für Datenschutz und Informationsfreiheit (HBDI)</strong>, Postfach 3163, 65021 Wiesbaden, <a href="mailto:poststelle@datenschutz.hessen.de">poststelle@datenschutz.hessen.de</a>.</p>
           </div>
 
           <div className="legal-section">
-            <h2>8. Cookies & Tracking</h2>
+            <h2>9. Cookies & Tracking</h2>
             <p>Marketing-Website: keine Tracking- oder Marketing-Cookies. Anwendung: ausschließlich technisch notwendige Session- und Auth-Cookies für den Login.</p>
           </div>
 
           <div className="legal-section">
-            <h2>9. Verschlüsselung</h2>
+            <h2>10. Verschlüsselung</h2>
             <p>Datenübertragung erfolgt über TLS 1.3. Datenspeicherung erfolgt AES-256-verschlüsselt.</p>
           </div>
-        </div>
-      </div>
-    </>
+      </LegalPage>
   );
 }
 
-const CSS = `
-  html, body { background: var(--color-base); }
-  .legal-root { min-height: 100vh; background: var(--color-base); font-family: 'Lora', Georgia, serif; color: var(--color-text); -webkit-font-smoothing: antialiased; }
-  .legal-inner { max-width: 720px; margin: 0 auto; padding: 64px 32px 96px; }
-  .legal-back { display: inline-flex; align-items: center; gap: 6px; font-family: 'Poppins',system-ui,sans-serif; font-size: 13px; color: var(--color-text-muted); text-decoration: none; margin-bottom: 40px; transition: color 120ms; }
-  .legal-back:hover { color: var(--color-accent-text); }
-  .legal-h1 { font: 700 32px/1.2 'Poppins',system-ui,sans-serif; color: var(--color-text); margin: 0 0 12px; letter-spacing: -0.02em; }
-  .legal-meta { font: 400 13px/1.5 'Poppins',system-ui,sans-serif; color: var(--color-text-muted); margin: 0 0 48px; }
-  .legal-section { margin-bottom: 36px; }
-  .legal-section h2 { font: 600 15px/1.3 'Poppins',system-ui,sans-serif; color: var(--color-accent-text); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
-  .legal-section p { font: 400 15px/1.7 'Lora',Georgia,serif; color: var(--color-text-secondary); margin: 0; }
-  .legal-section strong { color: var(--color-text); font-weight: 600; }
-  .legal-section a { color: var(--color-accent-text); text-decoration: none; }
-  .legal-section a:hover { color: var(--color-accent-hover); text-decoration: underline; }
-  .legal-table { width: 100%; border-collapse: collapse; margin: 0; font: 400 14px/1.5 'Lora',Georgia,serif; }
-  .legal-table th { text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); }
-  .legal-table td { padding: 10px 12px; color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border); }
-  .legal-table tr:last-child td { border-bottom: none; }
-`;

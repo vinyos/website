@@ -1,0 +1,155 @@
+{
+  "skala": 516.1290322580645,
+  "segmente": [
+    {
+      "nr": 1,
+      "name": "Befestigungsflansch",
+      "von": 0,
+      "bis": 23.3,
+      "mitte": 11.65,
+      "volumen": 35.86,
+      "flaechen": 82,
+      "n_dreh": 31,
+      "n_fraes": 51,
+      "dreiecke": 27600,
+      "dreh": {
+        "vOff": 0,
+        "vLen": 80424,
+        "nOff": 80424,
+        "nLen": 40212,
+        "iOff": 120636,
+        "iLen": 128124
+      },
+      "fraes": {
+        "vOff": 248760,
+        "vLen": 32412,
+        "nOff": 281172,
+        "nLen": 16212,
+        "iOff": 297384,
+        "iLen": 37488
+      },
+      "lOff": 334872,
+      "lLen": 14244
+    },
+    {
+      "nr": 2,
+      "name": "Führungsrohr",
+      "von": 23.3,
+      "bis": 62,
+      "mitte": 42.65,
+      "volumen": 50.8,
+      "flaechen": 18,
+      "n_dreh": 14,
+      "n_fraes": 4,
+      "dreiecke": 6282,
+      "dreh": {
+        "vOff": 349116,
+        "vLen": 29388,
+        "nOff": 378504,
+        "nLen": 14700,
+        "iOff": 393204,
+        "iLen": 29484
+      },
+      "fraes": {
+        "vOff": 422688,
+        "vLen": 8220,
+        "nOff": 430908,
+        "nLen": 4116,
+        "iOff": 435024,
+        "iLen": 8220
+      },
+      "lOff": 443244,
+      "lLen": 6540
+    },
+    {
+      "nr": 3,
+      "name": "Dichtsitz",
+      "von": 62,
+      "bis": 74,
+      "mitte": 68,
+      "volumen": 6.52,
+      "flaechen": 8,
+      "n_dreh": 8,
+      "n_fraes": 0,
+      "dreiecke": 2016,
+      "dreh": {
+        "vOff": 449784,
+        "vLen": 12096,
+        "nOff": 461880,
+        "nLen": 6048,
+        "iOff": 467928,
+        "iLen": 12096
+      },
+      "fraes": {
+        "vOff": 480024,
+        "vLen": 0,
+        "nOff": 480024,
+        "nLen": 0,
+        "iOff": 480024,
+        "iLen": 0
+      },
+      "lOff": 480024,
+      "lLen": 2784
+    },
+    {
+      "nr": 4,
+      "name": "Schaft",
+      "von": 74,
+      "bis": 85.3,
+      "mitte": 79.65,
+      "volumen": 9.22,
+      "flaechen": 6,
+      "n_dreh": 6,
+      "n_fraes": 0,
+      "dreiecke": 1516,
+      "dreh": {
+        "vOff": 482808,
+        "vLen": 9096,
+        "nOff": 491904,
+        "nLen": 4548,
+        "iOff": 496452,
+        "iLen": 9096
+      },
+      "fraes": {
+        "vOff": 505548,
+        "vLen": 0,
+        "nOff": 505548,
+        "nLen": 0,
+        "iOff": 505548,
+        "iLen": 0
+      },
+      "lOff": 505548,
+      "lLen": 2700
+    },
+    {
+      "nr": 5,
+      "name": "Gewindekopf",
+      "von": 85.3,
+      "bis": 103.4,
+      "mitte": 94.35,
+      "volumen": 13.31,
+      "flaechen": 13,
+      "n_dreh": 11,
+      "n_fraes": 2,
+      "dreiecke": 1570,
+      "dreh": {
+        "vOff": 508248,
+        "vLen": 9012,
+        "nOff": 517260,
+        "nLen": 4512,
+        "iOff": 521772,
+        "iLen": 9300
+      },
+      "fraes": {
+        "vOff": 531072,
+        "vLen": 144,
+        "nOff": 531216,
+        "nLen": 72,
+        "iOff": 531288,
+        "iLen": 120
+      },
+      "lOff": 531408,
+      "lLen": 4608
+    }
+  ]
+}
