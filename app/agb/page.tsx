@@ -1,24 +1,17 @@
+import LegalPage from "../_legal/LegalPage";
+
 export default function Agb() {
   return (
-    <>
-      <style>{CSS}</style>
-      <div className="legal-root">
-        <div className="legal-inner">
-          <a href="/" className="legal-back">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M9 2L4 7l5 5" /></svg>
-            Zurück
-          </a>
-          <h1 className="legal-h1">Allgemeine Geschäftsbedingungen</h1>
-          <p className="legal-meta">Vinyos AI UG (haftungsbeschränkt) · Stand: Juni 2026 · Gilt ausschließlich für Unternehmer (§ 14 BGB)</p>
+    <LegalPage title="Allgemeine Geschäftsbedingungen" meta="Vinyos AI UG (haftungsbeschränkt) · Stand: September 2026 · Gilt ausschließlich für Unternehmer (§ 14 BGB)" current="/agb">
 
           <div className="legal-section">
             <h2>§ 1 Geltungsbereich</h2>
-            <p>Diese AGB gelten für alle Verträge über die Nutzung von <strong>Vinyos Quote</strong> zwischen der Vinyos AI UG (haftungsbeschränkt), Am Schlangensee 137, 64807 Dieburg (nachfolgend „Vinyos") und dem Kunden. Der Dienst richtet sich ausschließlich an <strong>Unternehmer i. S. v. § 14 BGB</strong> — kein Verbrauchergeschäft. Entgegenstehende AGB des Kunden gelten nicht, sofern nicht ausdrücklich schriftlich anerkannt.</p>
+            <p>Diese AGB gelten für alle Verträge über die Nutzung von <strong>Vinyos Quote</strong> zwischen der Vinyos AI UG (haftungsbeschränkt), Am Schlangensee 137, 64807 Dieburg (nachfolgend „Vinyos") und dem Kunden. Der Dienst richtet sich ausschließlich an <strong>Unternehmer i. S. v. § 14 BGB</strong>, nicht an Verbraucher. Entgegenstehende AGB des Kunden gelten nicht, sofern nicht ausdrücklich schriftlich anerkannt.</p>
           </div>
 
           <div className="legal-section">
             <h2>§ 2 Vertragsgegenstand & Leistungsbeschreibung</h2>
-            <p>Vinyos Quote ist eine KI-gestützte SaaS-Lösung zur Analyse technischer Zeichnungen und 3D-Modelle sowie zur Erstellung von Angebots- und Kalkulationsvorschlägen für Drehteile. Während der Closed Beta ist der Dienst in Umfang und Verfügbarkeit eingeschränkt und kann sich ändern.</p>
+            <p>Vinyos Quote ist eine KI-gestützte SaaS-Lösung zur Analyse technischer Zeichnungen und 3D-Modelle sowie zur Erstellung von Angebots- und Kalkulationsvorschlägen für Dreh- und Frästeile. Der Leistungsumfang ergibt sich aus dem gewählten Tarif. Vinyos entwickelt den Dienst laufend weiter, einzelne Funktionen können sich daher ändern.</p>
           </div>
 
           <div className="legal-section">
@@ -37,7 +30,7 @@ export default function Agb() {
           </div>
 
           <div className="legal-section">
-            <h2>§ 6 KI-gestützte Ergebnisse — Disclaimer</h2>
+            <h2>§ 6 KI-gestützte Ergebnisse (Disclaimer)</h2>
             <p>Die Ergebnisse (Merkmalsextraktion, Kalkulation, Angebote) werden KI-gestützt erzeugt und stellen <strong>unverbindliche Vorschläge</strong> dar. Vinyos übernimmt keine Gewähr für Richtigkeit, Vollständigkeit oder Eignung. Die finale Prüfung und Verantwortung für jedes Angebot liegt beim Kunden (menschliche Endkontrolle). Vinyos schuldet keinen bestimmten Kalkulationserfolg und ist nicht für geschäftliche Entscheidungen des Kunden auf Basis der Ergebnisse verantwortlich.</p>
           </div>
 
@@ -53,12 +46,12 @@ export default function Agb() {
 
           <div className="legal-section">
             <h2>§ 9 Verfügbarkeit</h2>
-            <p>Vinyos bemüht sich um hohe Verfügbarkeit, schuldet während der Beta jedoch kein bestimmtes SLA. Wartungsarbeiten und Änderungen bleiben vorbehalten.</p>
+            <p>Vinyos bemüht sich um hohe Verfügbarkeit, schuldet jedoch kein bestimmtes SLA, sofern nicht gesondert vereinbart. Wartungsarbeiten und Änderungen bleiben vorbehalten.</p>
           </div>
 
           <div className="legal-section">
             <h2>§ 10 Vergütung & Zahlung</h2>
-            <p>Die Vergütung richtet sich nach der individuellen Vereinbarung. Abrechnung erfolgt per Rechnung (Überweisung). Alle Preise verstehen sich netto zuzüglich der gesetzlichen Umsatzsteuer.</p>
+            <p>Die Vergütung richtet sich nach dem gewählten Tarif oder der individuellen Vereinbarung. Reguläre Tarife werden monatlich über den Zahlungsdienstleister Stripe per Kreditkarte oder SEPA-Lastschrift abgerechnet, individuelle Vereinbarungen per Rechnung (Überweisung). Alle Preise verstehen sich netto zuzüglich der gesetzlichen Umsatzsteuer.</p>
           </div>
 
           <div className="legal-section">
@@ -75,24 +68,7 @@ export default function Agb() {
             <h2>§ 13 Schlussbestimmungen</h2>
             <p>Es gilt deutsches Recht. Gerichtsstand ist der Sitz von Vinyos (Dieburg). Änderungen dieser AGB werden dem Kunden mit angemessener Frist angekündigt. Sollten einzelne Bestimmungen unwirksam sein, bleibt der Vertrag im Übrigen wirksam.</p>
           </div>
-        </div>
-      </div>
-    </>
+      </LegalPage>
   );
 }
 
-const CSS = `
-  html, body { background: var(--color-base); }
-  .legal-root { min-height: 100vh; background: var(--color-base); font-family: 'Lora', Georgia, serif; color: var(--color-text); -webkit-font-smoothing: antialiased; }
-  .legal-inner { max-width: 720px; margin: 0 auto; padding: 64px 32px 96px; }
-  .legal-back { display: inline-flex; align-items: center; gap: 6px; font-family: 'Poppins',system-ui,sans-serif; font-size: 13px; color: var(--color-text-muted); text-decoration: none; margin-bottom: 40px; transition: color 120ms; }
-  .legal-back:hover { color: var(--color-accent-text); }
-  .legal-h1 { font: 700 32px/1.2 'Poppins',system-ui,sans-serif; color: var(--color-text); margin: 0 0 12px; letter-spacing: -0.02em; }
-  .legal-meta { font: 400 13px/1.5 'Poppins',system-ui,sans-serif; color: var(--color-text-muted); margin: 0 0 48px; }
-  .legal-section { margin-bottom: 36px; }
-  .legal-section h2 { font: 600 15px/1.3 'Poppins',system-ui,sans-serif; color: var(--color-accent-text); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
-  .legal-section p { font: 400 15px/1.7 'Lora',Georgia,serif; color: var(--color-text-secondary); margin: 0; }
-  .legal-section strong { color: var(--color-text); font-weight: 600; }
-  .legal-section a { color: var(--color-accent-text); text-decoration: none; }
-  .legal-section a:hover { color: var(--color-accent-hover); text-decoration: underline; }
-`;
