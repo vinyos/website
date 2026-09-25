@@ -6,14 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Sprache & Schreibweise — WICHTIG
 
-⚠️ **Vor jedem kundensichtbaren Text `../docs/schreibweise.md` lesen.** Dort stehen die
-verbindlichen Regeln für App und Website: Anrede (durchgängig Sie, auch Imperative),
-Satzzeichen (**keine Gedankenstriche**), Produktname (immer „Vinyos Quote", nie nur
-„Vinyos"), Textlänge (höchstens drei Sätze, Titel höchstens vier Wörter), Zahlen und
-Einheiten, und die wiederkehrenden Bausteine für Leerzustände, Knöpfe, Fehlermeldungen
-und Platzhalter.
+⚠️ **Verbindlich für jeden kundensichtbaren Text** auf Website und in der App:
 
-Die Datei enthält auch die Grep-Befehle, mit denen sich Rückfälle finden lassen.
+- Anrede durchgängig **Sie**, auch in Imperativen („Wählen Sie", nicht „Wähle").
+- **Keine Gedankenstriche** in kundensichtbaren Texten.
+- Produktname immer **„Vinyos Quote"**, nie nur „Vinyos".
+- Höchstens drei Sätze, Titel höchstens vier Wörter.
+
+Dieselben Regeln stehen in `vinyos-quote/CLAUDE.md`. (Hier verwies früher
+`../docs/schreibweise.md`; die Datei hat es nie gegeben.)
+
 ## Commands
 
 ```bash
