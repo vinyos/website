@@ -68,6 +68,12 @@
   --color-accent-text:   #6fb3b1;
 }
 
+/* Skalierungseinheit der Startseite: 1 Design-Pixel. Bis 1440 px Breite gleich 1px,
+   darüber wächst sie mit der Bildschirmbreite (bei 2090 px das Maximum 1,45px). Die Höhe
+   begrenzt mit (1 px je 800 px Höhe), damit die Story-Texte auf breiten, niedrigen Fenstern passen.
+   Liegt auf :root, weil das Zeichnungs-Modal per Portal außerhalb von .hm-page rendert. */
+:root { --hm-u: clamp(1px, min(.06944vw, .125vh), 1.45px); }
+
 * { box-sizing: border-box; }
 html, body {
   background: var(--color-base);

@@ -45,7 +45,7 @@ export default function LegalPage({ title, meta, current, children }: { title: s
     <div className="lx">
       <style>{CSS}</style>
       <header className="lx-head">
-        <a className="lx-logo" href={HOME}>vinyos<span>quote</span></a>
+        <a className="lx-logo" href={HOME}>vinyos<span>QUOTE</span></a>
         <nav aria-label="Hauptnavigation"><a href={`${HOME}#entdecken`}>So funktioniert es</a><a href={`${HOME}#preise`}>Preise</a></nav>
         <div className="lx-actions"><a href={LOGIN_URL}>Anmelden</a><a className="lx-cta" href={SIGNUP_URL}>Kostenlos testen <span>↗</span></a></div>
       </header>
@@ -87,7 +87,7 @@ html,body{background:#eef0ed}
 
 .lx-head{position:sticky;top:0;z-index:10;height:90px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;border-bottom:1px solid var(--hm-line);background:var(--hm-bg)}
 .lx-logo{font:600 29px/1 var(--hm-display);letter-spacing:-1.7px;display:flex;align-items:baseline;gap:7px}
-.lx-logo span{font:400 12px var(--hm-body);letter-spacing:0;color:var(--hm-muted)}
+.lx-logo span{font:400 12px var(--hm-body);letter-spacing:.8px;color:var(--hm-muted)}
 .lx-head nav{display:flex;gap:30px;font-size:12px}
 .lx-actions{display:flex;justify-content:flex-end;align-items:center;gap:26px;font-size:12px}
 .lx-head a:hover{filter:brightness(.8)}
