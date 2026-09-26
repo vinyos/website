@@ -23,7 +23,6 @@ export default function HeroMotion({ children }: { children: React.ReactNode }) 
   const progressBar = useRef<HTMLDivElement>(null);
   const [chapter, setChapter] = useState(0);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
-  const [reduced, setReduced] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const current = CHAPTERS[chapter];
   const details = current.segment >= 0 ? DETAILS[current.segment] : [];
@@ -45,9 +44,8 @@ export default function HeroMotion({ children }: { children: React.ReactNode }) 
     let raf = 0;
     const disposals: (() => void)[] = [];
     const clean = () => { cancelAnimationFrame(raf); disposals.splice(0).reverse().forEach(dispose => dispose()); };
-    const changePreference = () => { reduceMotion = preference.matches; setReduced(reduceMotion); };
+    const changePreference = () => { reduceMotion = preference.matches; };
     preference.addEventListener("change", changePreference);
-    setReduced(reduceMotion);
     setStatus("loading");
 
     (async () => {
@@ -238,7 +236,8 @@ export default function HeroMotion({ children }: { children: React.ReactNode }) 
         const fade = Math.max(0,Math.min(1,(.12-proximity)/.12));
         const visibility = reduceMotion ? 1 : fade*fade*(3-2*fade);
         const item = CHAPTERS[active];
-        const entries = item.segment >= 0 ? DETAILS[item.segment] : [];
+        // Auf dem Handy nur eine Beschriftung, damit das Modell frei bleibt.
+        const entries = item.segment >= 0 ? DETAILS[item.segment].slice(0, mobile ? 1 : undefined) : [];
         const selection = String(active);
         if (selection !== selected) {
           selected = selection; setChapter(active);
@@ -249,7 +248,9 @@ export default function HeroMotion({ children }: { children: React.ReactNode }) 
         mount.style.opacity="1";
         group.rotation.set(pose.rx,pose.ry,pose.rz);
         const intro = Math.max(0,1-position/.8);
-        group.position.set(mobile ? 0 : pose.x*viewHeight*width/height, mobile ? viewHeight*.17-46*intro : pose.y, 0);
+        // Unter 1700 px rückt das Modell stufenlos nach außen, damit es nicht in den Text ragt (bis Faktor 1,5 bei 1100 px).
+        const side=pose.x*Math.min(1.5,Math.max(1,1+(1700-width)/1200));
+        group.position.set(mobile ? 0 : side*viewHeight*width/height, mobile ? viewHeight*.17-46*intro : pose.y, 0);
         const mobileScale=.5*Math.min(1,Math.max(.72,(height-420)/240));
         group.scale.setScalar(pose.scale*(mobile ? mobileScale+(.82-mobileScale)*intro : .85+.15*intro));
         const context=reduceMotion?0:Math.pow(Math.sin(local*Math.PI),4)*.32;
@@ -272,8 +273,8 @@ export default function HeroMotion({ children }: { children: React.ReactNode }) 
         }
         const hull=convexHull(projected);
         renderer.render(scene,camera);
-        element.style.setProperty("--hm-model-x", `${mobile ? 50 : 50+pose.x*100}%`);
-        if (copy.current) { copy.current.style.opacity=String(visibility); copy.current.style.transform=`translateY(${(1-visibility)*(local<.5?-10:10)}px)`; }
+        element.style.setProperty("--hm-model-x", `${mobile ? 50 : 50+side*100}%`);
+        if (copy.current) { copy.current.style.opacity=String(visibility); copy.current.style.setProperty("--hm-copy-shift",`${(1-visibility)*(local<.5?-10:10)}px`); }
         if (progressBar.current) progressBar.current.style.transform=`scaleX(${progress})`;
         const placed: Rect[] = [];
         badges.current.forEach((badge, index) => {
@@ -291,9 +292,13 @@ export default function HeroMotion({ children }: { children: React.ReactNode }) 
           nodes[item.segment].node.localToWorld(vector); vector.project(camera);
           const x=(vector.x+1)*width/2, y=(1-vector.y)*height/2;
           const w=badge.offsetWidth, h=badge.offsetHeight;
-          const minX=mobile?12:(item.side==="right"?width*.035:width*.52);
-          const maxX=mobile?width-12:(item.side==="right"?width*.48:width*.965);
-          const minY=mobile?76:100, maxY=height*(mobile?.55:.87);
+          // Beschriftungen bleiben auf der Modellseite und halten Abstand zur tatsächlichen Textkante.
+          const copyLeft=copy.current?.offsetLeft ?? width*.48, copyRight=copyLeft+(copy.current?.offsetWidth ?? width*.04);
+          const gap=Math.max(32,width*.03);
+          const minX=mobile?12:(item.side==="right"?width*.035:copyRight+gap);
+          const maxX=mobile?width-12:(item.side==="right"?copyLeft-gap:width*.965);
+          const headerBottom=element.querySelector(".hm-header")?.getBoundingClientRect().bottom ?? (mobile?65:90);
+          const minY=headerBottom+(mobile?11:10), maxY=mobile?(copy.current?.offsetTop ?? height*.45)-14:height*.87;
           const placement=placeAnnotation({x,y},{w,h},{x:minX,y:minY,w:maxX-minX,h:maxY-minY},hull,placed);
           if(!placement){
             badge.style.visibility="hidden"; line.style.opacity="0"; dot.style.opacity="0";
@@ -324,7 +329,7 @@ export default function HeroMotion({ children }: { children: React.ReactNode }) 
   return <div className="hm-page"><style>{CSS}</style>
     <section className="hm" id="entdecken" ref={root} data-side={current.side} data-kind={current.kind} data-ready={status === "ready"}>
       <div className="hm-stage">
-        <header className="hm-header"><a href="#entdecken" className="hm-logo" onClick={e=>{e.preventDefault();jump(0);}}>vinyos<span>quote</span></a><nav aria-label="Hauptnavigation"><button onClick={()=>jump(2)}>So funktioniert es</button><a href="#preise">Preise</a></nav><div className="hm-header-actions"><a href={LOGIN_URL} className="hm-login">Anmelden</a><a className="hm-cta hm-cta-small" href={SIGNUP_URL}>Kostenlos testen <span>↗</span></a></div></header>
+        <header className="hm-header"><a href="#entdecken" className="hm-logo" onClick={e=>{e.preventDefault();jump(0);}}>vinyos<span>QUOTE</span></a><nav aria-label="Hauptnavigation"><button onClick={()=>jump(2)}>So funktioniert es</button><a href="#preise">Preise</a></nav><div className="hm-header-actions"><a href={LOGIN_URL} className="hm-login">Anmelden</a><a className="hm-cta hm-cta-small" href={SIGNUP_URL}>Kostenlos testen <span>↗</span></a></div></header>
         <div className="hm-floor" aria-hidden="true" />
         <div className="hm-scene" ref={host} role="img" aria-label={current.segment >= 0 ? `Hero Teil 2: ${mesh.segmente[current.segment].name}. ${details.map(d=>`${d.label}: ${d.value}`).join(". ")}` : "Hero Teil 2: vollständige Flanschbuchse"} />
         <svg className="hm-leader" aria-hidden="true">{[0,1,2].map(i=><g key={i}><path ref={el=>{lines.current[i]=el;}}/><circle ref={el=>{dots.current[i]=el;}} r="2.5"/></g>)}</svg>
@@ -332,8 +337,8 @@ export default function HeroMotion({ children }: { children: React.ReactNode }) 
         <div className="hm-copy" ref={copy}>
           <div className="hm-eyebrow">{current.eyebrow}</div>
           {chapter===0 ? <h1>{current.title.split("\n").map((t,i)=><span key={i}>{t}{i===0?" ":""}</span>)}</h1> : <h2>{current.title.split("\n").map((t,i)=><span key={i}>{t}{i===0?" ":""}</span>)}</h2>}
-          {current.body && <p className="hm-body">{current.body}</p>}
-          {current.kind==="problem" && <div className="hm-comparison"><div className="hm-comparison-head"><span>Heute, von Hand</span><span>Mit Vinyos Quote</span></div>{[["Erfahrung und Bauchgefühl","Regelbasiert und konsistent"],["Anfragen stapeln sich","Geometrie automatisch auswerten"],["Aufwand auch ohne Auftrag","Weniger manuelle Kalkulation"]].map(([before,after])=><div className="hm-comparison-row" key={before}><span className="hm-comparison-before">{before}</span><span className="hm-comparison-after"><i aria-hidden="true">+</i>{after}</span></div>)}</div>}
+          {current.body && <p className="hm-body"><span className="hm-body-full">{current.body}</span><span className="hm-body-short">{current.short}</span></p>}
+          {current.kind==="problem" && <div className="hm-comparison"><div className="hm-comparison-head"><span>Heute, von Hand</span><span>Mit Vinyos Quote</span></div>{[["Erfahrung und Bauchgefühl","Regelbasiert und konsistent"],["Anfragen stapeln sich","Geometrie automatisch auswerten"],["Aufwand auch ohne Auftrag","Weniger manuelle Kalkulation"]].map(([before,after])=><div className="hm-comparison-row" key={before}><span className="hm-comparison-before">{before}</span><span className="hm-comparison-after"><i aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 4.5v7M4.5 8h7"/></svg></i>{after}</span></div>)}</div>}
           {current.kind==="process" && <ol className="hm-process"><li><b>01</b><div><strong>Parallel analysieren</strong><span>STEP und PDF werden gleichzeitig ausgewertet.</span></div></li><li><b>02</b><div><strong>Modell zusammenführen</strong><span>Features und Segmente erhalten die passende Toleranz und Oberfläche.</span></div></li><li><b>03</b><div><strong>Prüfen und kalkulieren</strong><span>Sie prüfen das Ergebnis und kalkulieren den Preis mit einem Klick.</span></div></li></ol>}
           {current.kind==="precision" && <div className="hm-document"><div><span>PDF + STEP</span><strong>Toleranzen und Oberflächen in Geometrie eingefügt.</strong></div><div className="hm-document-values"><span>Oberfläche <b>Ra 1,6</b></span><span>Toleranz <b>ISO 2768-mK</b></span></div><DrawingExplorer /></div>}
           {current.kind==="calculation" && <div className="hm-costs">{["Maschinenzeit und Rüsten","Material und Rohteil","Qualitätssicherung und Nachbehandlung","Gemeinkosten und Marge"].map((text,i)=><div key={text}><span>{String(i+1).padStart(2,"0")}</span>{text}<i>✓</i></div>)}</div>}
@@ -341,8 +346,7 @@ export default function HeroMotion({ children }: { children: React.ReactNode }) 
           {current.kind==="trial" && <div className="hm-trial"><a href={SIGNUP_URL} className="hm-cta">Kostenlos testen <span>↗</span></a><small>7 Tage · 25 Anfragen kostenlos</small></div>}
         </div>
         {status!=="ready" && <div className="hm-status" role="status">{status==="loading" ? "Modell wird geladen …" : <><p>Das Modell konnte nicht geladen werden.</p><button onClick={()=>setAttempt(a=>a+1)}>Erneut versuchen</button></>}</div>}
-        <footer className="hm-footer"><span className="hm-scroll">{reduced?"Reduzierte Bewegung":"Scrollen Sie zum Entdecken"}<i>↓</i></span><nav aria-label="Animationsabschnitte">{CHAPTERS.map((c,i)=><button key={c.label} aria-label={c.label} aria-current={chapter===i?"step":undefined} onClick={()=>jump(i)}><span>{String(i+1).padStart(2,"0")}</span><i/></button>)}</nav><span className="hm-example">{chapter===0?"HERO TEIL 2":"BEISPIELAUSWERTUNG"}</span></footer>
-        <div className="hm-progress"><div ref={progressBar}/></div>
+        <div className="hm-progress" aria-hidden="true"><div ref={progressBar}/></div>
       </div>
     </section>{children}
   </div>;
